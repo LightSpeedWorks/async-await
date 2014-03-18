@@ -1,0 +1,19 @@
+{
+  "name": "aa",
+  "version": "0.0.0",
+  "description": "reserved",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LightSpeedWorks/aa.git"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LightSpeedWorks/aa/issues"
+  },
+  "homepage": "https://github.com/LightSpeedWorks/aa"
+}
