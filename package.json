@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "reserved",
   "main": "lib/aa.js",
   "scripts": {
@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/LightSpeedWorks/aa",
   "devDependencies": {
-    "co": "^3.0.5"
+    "co": ">=3.0.5"
   }
 }
