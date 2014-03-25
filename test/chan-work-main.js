@@ -27,7 +27,7 @@ ch(cb);
 
 ch(56);
 
-ch.close();
+ch.end();
 ch(cb);
 ch(cb);
 
