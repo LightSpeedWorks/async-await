@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "reserved",
   "main": "lib/aa.js",
   "scripts": {
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/LightSpeedWorks/aa",
   "dependencies": {
-    "co": ">=3.0.5"
+    "co": ">=3.0.5",
+    "aa-thunkify": ">=0.0.1"
   }
 }
