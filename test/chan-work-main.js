@@ -2,20 +2,33 @@
 
 'use strict';
 
-var chan = require('../lib/chan');
+var makeChan = require('../lib/chan');
 
-var ch = chan();
+var ch = makeChan();
 
 function cb(err, val) {
-  if (err) console.log(err);
-  else console.log(val);
-}
+  if (err) {
+    console.log('recv: '+ err);
+  }
+  else if (typeof val === 'object' && val !== null && ch.empty === val) {
+    console.log('recv: empty');
+  }
+  else {
+    console.log('recv: val = ' + val);
+  }
+} // cb
 
-chan(12);
-chan(34);
+ch(12);
+ch(34);
 
-chan(cb);
-chan(cb);
-chan(cb);
+ch(cb);
+ch(cb);
+ch(cb);
 
-chan(56);
+ch(56);
+
+ch.close();
+ch(cb);
+ch(cb);
+
+// ch(78);
