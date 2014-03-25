@@ -16,7 +16,7 @@
     "url": "https://github.com/LightSpeedWorks/aa/issues"
   },
   "homepage": "https://github.com/LightSpeedWorks/aa",
-  "devDependencies": {
+  "dependencies": {
     "co": ">=3.0.5"
   }
 }
