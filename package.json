@@ -1,17 +1,19 @@
 {
   "name": "aa",
-  "version": "0.0.3",
-  "description": "reserved",
+  "version": "0.0.4",
+  "description": "Async-Await. co, co-chan, co-thunkify package",
   "main": "lib/aa.js",
   "dependencies": {
-    "aa-thunkify": ">=0.0.1",
+    "co-thunkify": ">=0.0.0",
     "co": ">=3.0.5",
-    "co-chan": "0.0.0"
+    "co-chan": ">=0.0.1"
   },
   "devDependencies": {},
   "keywords": [
     "chan",
     "co",
+    "co-chan",
+    "co-thunkify",
     "go",
     "channel",
     "aa",
