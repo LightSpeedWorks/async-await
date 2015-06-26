@@ -2,7 +2,7 @@
 
 'use strict';
 
-var thunkify = require('../lib/aa').thunkify;
+var thunkify = require('../aa').thunkify;
 
 var addSync = thunkify(function (a1, a2, cb) {
   cb(null, a1 + a2);

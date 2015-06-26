@@ -6,7 +6,7 @@
     return inspect(x, {colors: true});
   }
 
-  try { var aa = require('../lib/aa'); }
+  try { var aa = require('../aa'); }
   catch (err) { var aa = require('aa'); }
 
   function coSleep(ms, val) {

@@ -2,7 +2,7 @@
 
 (function main() {
 
-  var aa = require('../lib/aa');
+  var aa = require('../aa');
   var PromiseThunk = require('promise-thunk');
   var TIME = 300;
   var LONG_TIME = 500;

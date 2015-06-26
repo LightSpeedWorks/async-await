@@ -2,7 +2,7 @@
   "name": "aa",
   "version": "0.1.1",
   "description": "Async-Await. co like, co-chan, co-thunkify package",
-  "main": "lib/aa.js",
+  "main": "aa.js",
   "dependencies": {
     "co-chan": ">=0.0.1",
     "promise-thunk": ">=0.0.2"

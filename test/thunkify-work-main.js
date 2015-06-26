@@ -2,10 +2,10 @@
 
 'use strict';
 
-var thunkify = require('../lib/aa').thunkify;
+var thunkify = require('../aa').thunkify;
 
 var fs = require('fs');
-var aa = require('../lib/aa');
+var aa = require('../aa');
 
 var timer = thunkify(function (ms, cb) {
   return setTimeout(cb, ms);
