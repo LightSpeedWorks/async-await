@@ -55,7 +55,6 @@ this.aa = function () {
     // is not generator?
     if (!isGenerator(gtor))
       return chan.apply(ctx, arguments);
-      //throw new TypeError('arguments must be Generator or GeneratorFunction');
 
     var uniqId = 100; // unique id for debug
 
