@@ -39,9 +39,9 @@
   function * gen1(indent, indentString) {
     if (!indent) indent = 0;
     pr(yield delay(ms, indentString + indent + ': a'));
-    if (indent < depth) yield gen1(indent + 1, indentString + '  ');
+    if (indent < depth) yield * gen1(indent + 1, indentString + '  ');
     pr(yield delay(ms, indentString + indent + ': b'));
-    if (indent < depth) yield gen1(indent + 1, indentString + '  ');
+    if (indent < depth) yield * gen1(indent + 1, indentString + '  ');
     pr(yield delay(ms, indentString + indent + ': c'));
     return indentString + indent + ': ret';
   }
