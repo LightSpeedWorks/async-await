@@ -2,7 +2,7 @@
 
 this.aa = function () {
   var PromiseThunk = require('promise-thunk');
-  var chan = require('co-chan');
+  var chan = require('./chan');
   var isPromise = PromiseThunk.isPromise;
   var wrap = PromiseThunk.wrap;
 

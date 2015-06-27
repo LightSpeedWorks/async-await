@@ -1,10 +1,9 @@
 {
   "name": "aa",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Async-Await. co like, co-chan, co-thunkify package",
   "main": "aa.js",
   "dependencies": {
-    "co-chan": ">=0.0.1",
     "promise-thunk": ">=0.0.2"
   },
   "devDependencies": {},
