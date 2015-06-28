@@ -56,8 +56,6 @@ this.aa = function () {
     if (!isGenerator(gtor))
       return chan.apply(ctx, arguments);
 
-    var uniqId = 100; // unique id for debug
-
     var resolve, reject;
     var p = PromiseThunk(
       function (res, rej) { resolve = res; reject = rej; });
@@ -71,25 +69,13 @@ this.aa = function () {
         return reject(err);
       }
 
-      //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-      //var xyz = ret && ret.value;
-      var id = uniqId++;
-
-      //console.log('\x1b[44m    ret', id, typeof xyz,
-      //  ':', (xyz && xyz.hasOwnProperty('toString') && xyz + '') ||
-      //       (xyz && typeof xyz === 'function' && 'function' || xyz),
-      //  (ret && ret.done && '!!done!!' || ''), '\x1b[m');
-
       if (ret.done)
         return resolve(ret.value);
 
-      doValue(ret.value, next, id);
+      doValue(ret.value, next);
     }
 
-    function doValue(value, next, id) {
-
-      //var xyz = value;
-
+    function doValue(value, next) {
       // generator function, generator or promise
       if (isGeneratorFunction(value) ||
           isGenerator(value) || isPromise(value))
@@ -101,11 +87,6 @@ this.aa = function () {
 
       setImmediate(function () {
         var called;
-
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        //console.log('\x1b[46m    xyz', id, typeof xyz,
-        //  ':', (xyz && xyz.hasOwnProperty('toString') && xyz + '') ||
-        //       (xyz && typeof xyz === 'function' && 'function'|| xyz), '\x1b[m');
 
         // array
         if (value instanceof Array) {
