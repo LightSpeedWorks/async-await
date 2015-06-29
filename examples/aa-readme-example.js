@@ -4,12 +4,10 @@
     var aa = require('aa');
   }
 
-  var slice = [].slice;
-
 
   // wait(ms, args,... cb) : node style normal callback
   function wait(ms) {
-    var args = slice.call(arguments, 1);
+    var args = [].slice.call(arguments, 1);
     setTimeout.apply(null, [args.pop(), ms, null].concat(args));
   }
 
@@ -18,7 +16,7 @@
 
   // delay(ms, args,...)(cb) : thunk
   function delay(ms) {
-    var args = slice.call(arguments);
+    var args = [].slice.call(arguments);
     return function (cb) {
       wait.apply(null, args.concat(cb));
     };
