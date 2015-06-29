@@ -30,17 +30,18 @@ this.tree = function () {
     //console.log(new Error().stack);
     if (!level) level = 0;
 
+    var children = {};
+
     try {
       var names = yield readdir(dir);
     } catch (err) {
-      console.log('fs.readdir: ' + err);
+      console.log('tree: fs.readdir: ' + err);
       children[$error] = err;
       return children; //  null;
     }
 
     var totalsize = 0;
     var dirsize = 0;
-    var children = {};
 
     names.forEach(function (name) { children[name] = null; });
 
@@ -51,7 +52,7 @@ this.tree = function () {
         return {name:name, file:file, stat:fs_stat(file)}
       });
     } catch (err) {
-      console.log('fs_stat: ' + err);
+      console.log('tree: fs_stat: ' + err);
       children[$error] = err;
       return children;
     }
@@ -63,20 +64,21 @@ this.tree = function () {
         var stat = elem.stat;
 
         if (stat instanceof Error) {
-          console.log('stat error: ' + err);
+          console.log('tree: stat error: ' + err);
           return {name:name, size:0, child:null};
         }
 
         var size = stat.size;
         var file = elem.file;
 
+        var child = null;
         if (stat.isDirectory())
-          var child = tree(file, minSize, level + 1);
+          child = tree(file, minSize, level + 1);
 
         return {name:name, size:size, child:child}
       });
     } catch (err) {
-      console.log('tree: ' + err.stack);
+      console.log('tree: tree() ' + err.stack);
       children[$error] = err;
       return children;
     }
