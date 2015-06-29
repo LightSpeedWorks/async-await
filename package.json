@@ -1,7 +1,7 @@
 {
   "name": "aa",
-  "version": "0.1.2",
-  "description": "Async-Await. co like, co-chan, co-thunkify package",
+  "version": "0.1.3",
+  "description": "aa - Async-Await. co like library, go like channel, thunkify or promisefy wrap package",
   "main": "aa.js",
   "dependencies": {
     "promise-thunk": ">=0.0.2"
@@ -10,8 +10,8 @@
   "keywords": [
     "chan",
     "co",
-    "co-chan",
-    "co-thunkify",
+    "channel",
+    "thunkify",
     "go",
     "channel",
     "aa",
@@ -22,7 +22,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/LightSpeedWorks/aa.git"
+    "url": "LightSpeedWorks/aa"
   },
   "bugs": {
     "url": "https://github.com/LightSpeedWorks/aa/issues"
