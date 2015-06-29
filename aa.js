@@ -65,7 +65,7 @@ this.aa = function () {
 
     var gtors = [];
 
-    console.log('aa *************************************************' + (++aacount));
+    console.log('\x1b[32maa ******************** ' + (++aacount) + '\x1b[m');
 
     var resolve2, reject2, p = PromiseThunk(
       function (res, rej) { resolve2 = res; reject2 = rej; });
@@ -86,9 +86,9 @@ this.aa = function () {
 
     p.then(
       function (val) {
-        console.log('aa -------------------------------------------------' + (aacount--) + ' val: ' + val); },
+        console.log('\x1b[36maa -------------------- ' + (aacount--) + ' val: ' + val + '\x1b[m'); },
       function (err) {
-        console.log('aa -------------------------------------------------' + (aacount--) + ' err: ' + err); });
+        console.log('\x1b[35maa -------------------- ' + (aacount--) + ' err: ' + err + '\x1b[m'); });
 
     function next(err, val) {
       //console.log('\x1b[43merr&val', typeof err, err+'', typeof val, '\x1b[m');
@@ -108,7 +108,7 @@ this.aa = function () {
       if (ret.done)
         return resolve(ret.value);
 
-      doValue(ret.value, next);
+      nextTickDo(function () { doValue(ret.value, next); });
     }
 
     function doValue(value, next) {
