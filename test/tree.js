@@ -68,9 +68,6 @@ this.tree = function () {
         var size = elem.size;
         var child = elem.child;
 
-        //if (child instanceof Error)
-        //  children[name] = size;
-        //else 
         if (child && Number.isFinite(child[$totalsize])) {
           if (child[$totalsize] >= minSize)
             children[name] = child;
