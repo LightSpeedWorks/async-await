@@ -1,9 +1,13 @@
 [aa](https://www.npmjs.com/package/aa) - async await
 ====
 
-  async await library.
+  [aa](https://www.npmjs.com/package/aa) - Async-Await library.<br/>
+  co like library, go like channel, thunkify or promisefy wrap package.
 
   using ES6 (ES2015) generator function.
+
+  compatible with co@3 and co@4.
+
 
 INSTALL:
 ----
@@ -11,6 +15,15 @@ INSTALL:
 ```bash
 $ npm install aa
 ```
+
+
+PREPARE:
+----
+
+```js
+  var aa = require('aa');
+```
+
 
 USAGE:
 ----
@@ -194,6 +207,7 @@ $ iojs aa-readme-example.js
       return sleep(100, 66); }
   );
 ```
+
 
 LICENSE:
 ----
