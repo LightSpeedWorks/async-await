@@ -12,7 +12,6 @@
   // send: chan(data)
   // chan.end()
   // chan.readable()
-  // chan.size
   // chan.empty
   // chan.done()
   // chan.send(val or err)
@@ -29,18 +28,17 @@
     Channel.prototype.constructor = Channel;
   }
 
+  // Channel(empty)
   function Channel(empty) {
     if (arguments.length > 1)
       throw new Error('Channel: too many arguments');
+
     channel.$isClosed = false;    // send stream is closed
     channel.$isDone = false;      // receive stream is done
     channel.$recvCallbacks = [];  // receive pending callbacks queue
     channel.$sendValues    = [];  // send pending values
 
-    if (typeof empty === 'function')
-      channel.empty = new empty();
-    else
-      channel.empty = empty;
+    channel.empty = typeof empty === 'function' ? new empty() : empty;
 
     if (setProto)
       setProto(channel, Channel.prototype);
@@ -91,7 +89,7 @@
 
   } // Channel
 
-
+  // send(val or err)
   Channel.prototype.send = $$send;
   function $$send(val) {
     if (this.$isClosed)
@@ -102,6 +100,7 @@
       this.$sendValues.push(val);
   } // send
 
+  // recv(cb)
   Channel.prototype.recv = $$recv;
   function $$recv(cb) {
     if (this.done())
@@ -113,6 +112,7 @@
     return;
   } // recv
 
+  // done()
   Channel.prototype.done = $$done;
   function $$done() {
     if (!this.$isDone && this.$isClosed && this.$sendValues.length === 0) {
@@ -125,6 +125,7 @@
     return this.$isDone;
   } // done
 
+  // close() end()
   Channel.prototype.close = $$close;
   Channel.prototype.end = $$close;
   function $$close() {
@@ -132,6 +133,7 @@
     return this.done();
   } // close
 
+  // stream(stream)
   Channel.prototype.stream = $$stream;
   function $$stream(stream) {
     var channel = this;
@@ -148,9 +150,9 @@
       if (!buf) return;
       channel.send(buf);
     } // readable
-
   } // stream
 
+  // callback(cb, val or err)
   function callback(cb, val) {
     if (val instanceof Error)
       cb(val);
