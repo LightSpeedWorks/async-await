@@ -36,7 +36,7 @@ this.tree = function () {
       var names = yield readdir(dir);
     } catch (err) {
       console.log('tree: fs.readdir: ' + err);
-      children[$error] = err;
+      children[$error] = 'tree fs readdir: ' + err;
       return children; //  null;
     }
 
@@ -53,7 +53,7 @@ this.tree = function () {
       });
     } catch (err) {
       console.log('tree: fs_stat: ' + err);
-      children[$error] = err;
+      children[$error] = 'tree fs stat: ' + err;
       return children;
     }
 
@@ -64,7 +64,7 @@ this.tree = function () {
         var stat = elem.stat;
 
         if (stat instanceof Error) {
-          console.log('tree: stat error: ' + err);
+          console.log('tree: stat error: ' + stat);
           return {name:name, size:0, child:null};
         }
 
