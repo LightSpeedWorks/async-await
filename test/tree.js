@@ -9,25 +9,16 @@ this.tree = function () {
   var path = require('path');
   var $totalsize = '*totalsize*';
   var $error = '*error*';
+  var $path = '*path*';
   var INDENT = '  ';
 
-  var readdir = thunkify.call(fs, fs.readdir);
+  var readdir = thunkify(fs.readdir);
 
   var counter = 0;
-
-  //var lastTree = {};
-  //var timerCount = 3;
-  //var timer = setInterval(function () {
-  //  console.log('\x1b[90m' + inspect(lastTree) + '\x1b[m');
-  //  if (--timerCount <= 0) clearInterval(timer);
-  //}, 1000);
 
   //*****************************************************
   function *tree(dir, minSize, level) {
     if (!dir) dir = '.';
-    dir = path.resolve(dir);
-    //console.log(++counter + '\t' + level + '\t' + minSize + '\t' + dir);
-    //console.log(new Error().stack);
     if (!level) level = 0;
 
     var children = {};
@@ -37,7 +28,8 @@ this.tree = function () {
     } catch (err) {
       console.log('tree: fs.readdir: ' + err);
       children[$error] = 'tree fs readdir: ' + err;
-      return children; //  null;
+      children[$path] = dir;
+      return children;
     }
 
     var totalsize = 0;
@@ -54,6 +46,7 @@ this.tree = function () {
     } catch (err) {
       console.log('tree: fs_stat: ' + err);
       children[$error] = 'tree fs stat: ' + err;
+      children[$path] = dir;
       return children;
     }
 
@@ -80,6 +73,7 @@ this.tree = function () {
     } catch (err) {
       console.log('tree: tree() ' + err.stack);
       children[$error] = err;
+      children[$path] = dir;
       return children;
     }
 
@@ -111,18 +105,17 @@ this.tree = function () {
     });
 
     children[$totalsize] = totalsize;
-    //return lastTree = children;
+    children[$path] = dir;
     return children;
   }
 
   //*****************************************************
   // thunkify(fn)
   function thunkify(fn) {
-    var ctx = this;
     return function () {
       var args = [].slice.call(arguments);
       return function (cb) {
-        fn.apply(ctx, args.concat(cb));
+        fn.apply(null, args.concat(cb));
       };
     };
   } // thunkify
@@ -131,11 +124,10 @@ this.tree = function () {
   function fs_stat(file) {
     return function (cb) {
       fs.stat(file, function (err, stat) {
-        err && console.log('fs.stat: ' + err);
         if (err) cb(null, err); // !!! error -> data !!!
         else     cb(null, stat);
       });
-    }
+    };
   } // fs_stat
 
   //*****************************************************
@@ -181,11 +173,11 @@ this.tree = function () {
     // main
     if (require.main === module) {
       var dir = path.resolve(process.argv[2] || '.');
-      console.log('main', dir);
+      console.log('tree main:', dir);
       aa(tree(dir, eval(process.argv[3]) || 0, 0))
       .then(
         function (val) {
-          console.log('\x1b[36m' + inspect(val) + '\x1b[m');
+          console.log(inspect(val));
         },
         function (err) {
           console.log(err.stack);
