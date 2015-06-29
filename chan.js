@@ -18,6 +18,15 @@
   // chan.send(val or err)
   // chan.recv(cb)
 
+  // setProto(obj, proto)
+  var setProto = Object.setPrototypeOf || {}.__proto__ ?
+    function setProto(obj, proto) { obj.__proto__ = proto; } : null;
+
+  if (setProto)
+    setProto(Channel.prototype, Function.prototype);
+  else
+    Channel.prototype = Function();
+
   function Channel(empty) {
     if (arguments.length > 1)
       throw new Error('Channel: too many arguments');
@@ -33,10 +42,8 @@
     else
       channel.empty = empty;
 
-    if (Object.setPrototypeOf)
-      Object.setPrototypeOf(channel, Channel.prototype);
-    else if (channel.__proto__)
-      channel.__proto__ = Channel.prototype;
+    if (setProto)
+      setProto(channel, Channel.prototype);
     else {
       channel.close = $$close;
       channel.done  = $$done;
@@ -46,6 +53,12 @@
       // for stream
       channel.end      = $$close;
       channel.stream   = $$stream;
+
+      if (channel.call !== Function.prototype.call)
+        channel.call = Function.prototype.call;
+
+      if (channel.apply !== Function.prototype.apply)
+        channel.apply = Function.prototype.apply;
     }
 
     return channel;
