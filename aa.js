@@ -90,74 +90,69 @@ this.aa = function () {
     var resolve, reject, p = PromiseThunk(
       function (res, rej) { resolve = res; reject = rej; });
 
-    nextTick(makeEnv(gtor).callback);
+    nextTick(callback);
     return p;
 
-    function makeEnv(gtor) {
-      var env = {gtor:gtor, callback:callback};
-      return env;
-
-      function callback(err, val) {
-        try {
-          if (err) {
-            if (typeof gtor['throw'] !== 'function')
-              return reject(err);
-            var ret = gtor['throw'](err);
-          }
-          else
-            var ret = gtor.next(val);
-        } catch (err) {
-          return reject(err);
+    function callback(err, val) {
+      try {
+        if (err) {
+          if (typeof gtor['throw'] !== 'function')
+            return reject(err);
+          var ret = gtor['throw'](err);
         }
-
-        if (ret.done)
-          return resolve(ret.value);
-
-        nextTick(doValue, null, ret.value, env);
+        else
+          var ret = gtor.next(val);
+      } catch (err) {
+        return reject(err);
       }
+
+      if (ret.done)
+        return resolve(ret.value);
+
+      nextTick(doValue, null, ret.value, callback);
     }
 
-    function doValue(value, env) {
+    function doValue(value, callback) {
       if  (value == null ||
            typeof value !== 'object' &&
            typeof value !== 'function')
-        return env.callback(null, value);
+        return callback(null, value);
 
       if (value instanceof GeneratorFunction)
         value = value.apply(ctx, args);
 
       if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
-        return aa.call(ctx, value)(env.callback);
+        return aa.call(ctx, value)(callback);
 
       if (value instanceof PromiseThunk)
-        return value(env.callback);
+        return value(callback);
 
       if (isPromise(value))
-        return value.then(function (val) { env.callback(null, val); }, env.callback);
+        return value.then(function (val) { callback(null, val); }, callback);
 
       // function must be a thunk
       if (typeof value === 'function')
-        return value(env.callback);
+        return value(callback);
 
       var called = false;
 
       // array
       if (value instanceof Array) {
         var n = value.length;
-        if (n === 0) return env.callback(null, []);
+        if (n === 0) return callback(null, []);
         var arr = Array(n);
         value.forEach(function (val, i) {
-          doValue(val, {gtor:env.gtor, callback:function (err, val) {
+          doValue(val, function (err, val) {
             if (err) {
               if (!called)
-                called = true, env.callback(err);
+                called = true, callback(err);
             }
             else {
               arr[i] = val;
               if (--n === 0 && !called)
-                called = true, env.callback(null, arr);
+                called = true, callback(null, arr);
             }
-          }});
+          });
         });
       } // array
 
@@ -165,27 +160,27 @@ this.aa = function () {
       else if (value.constructor === Object) {
         var keys = Object.keys(value);
         var n = keys.length;
-        if (n === 0) return env.callback(null, {});
+        if (n === 0) return callback(null, {});
         var obj = {};
         keys.forEach(function (key) {
           obj[key] = undefined;
-          doValue(value[key], {gtor:env.gtor, callback:function (err, val) {
+          doValue(value[key], function (err, val) {
             if (err) {
               if (!called)
-                called = true, env.callback(err);
+                called = true, callback(err);
             }
             else {
               obj[key] = val;
               if (--n === 0 && !called)
-                called = true, env.callback(null, obj);
+                called = true, callback(null, obj);
             }
-          }});
+          });
         });
       } // object
 
       // other value
       else
-        return env.callback(null, value);
+        return callback(null, value);
     }
   }
 
