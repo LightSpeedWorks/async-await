@@ -95,7 +95,7 @@
     if (this.$isClosed)
       throw new Error('Cannot send to closed channel');
     else if (this.$recvCallbacks.length > 0)
-      callback(this.$recvCallbacks.shift(), val);
+      complete(this.$recvCallbacks.shift(), val);
     else
       this.$sendValues.push(val);
   } // send
@@ -106,7 +106,7 @@
     if (this.done())
       cb(null, this.empty);
     else if (this.$sendValues.length > 0)
-      callback(cb, this.$sendValues.shift());
+      complete(cb, this.$sendValues.shift());
     else
       this.$recvCallbacks.push(cb);
     return;
@@ -117,9 +117,9 @@
   function $$done() {
     if (!this.$isDone && this.$isClosed && this.$sendValues.length === 0) {
       this.$isDone = true;
-      // callback each pending callback with the empty value
+      // complete each pending callback with the empty value
       var empty = this.empty;
-      this.$recvCallbacks.forEach(function(cb) { callback(cb, empty); });
+      this.$recvCallbacks.forEach(function(cb) { complete(cb, empty); });
     }
 
     return this.$isDone;
@@ -152,13 +152,13 @@
     } // readable
   } // stream
 
-  // callback(cb, val or err)
-  function callback(cb, val) {
+  // complete(cb, val or err)
+  function complete(cb, val) {
     if (val instanceof Error)
       cb(val);
     else
       cb(null, val);
-  } // callback
+  } // complete
 
   if (typeof module === 'object' && module && module.exports)
     module.exports = Channel;
