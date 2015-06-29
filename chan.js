@@ -24,8 +24,10 @@
 
   if (setProto)
     setProto(Channel.prototype, Function.prototype);
-  else
+  else {
     Channel.prototype = Function();
+    Channel.prototype.constructor = Channel;
+  }
 
   function Channel(empty) {
     if (arguments.length > 1)
@@ -35,9 +37,7 @@
     channel.$recvCallbacks = [];  // receive pending callbacks queue
     channel.$sendValues    = [];  // send pending values
 
-    if (typeof empty === 'undefined')
-      channel.empty = new Object();
-    else if (typeof empty === 'function')
+    if (typeof empty === 'function')
       channel.empty = new empty();
     else
       channel.empty = empty;
