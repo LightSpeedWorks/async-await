@@ -45,13 +45,34 @@ this.aa = function () {
     typeof process === 'object' && process && typeof process.nextTick === 'function' ? process.nextTick :
     function nextTick(fn) { setTimeout(fn, 0); };
 
+  var tasks = [];
+  var nextTickProgress = false;
+
+  // nextTick(fn, ctx, ...args)
+  function nextTick(fn, ctx, args) {
+    if (typeof fn !== 'function')
+      throw new TypeError('fn must be a function');
+
+    tasks.push(arguments);
+    if (nextTickProgress) return;
+
+    nextTickProgress = true;
+    nextTickDo(function () {
+      var args;
+      while (args = tasks.shift()) {
+        var fn = args[0], ctx = args[1];
+        fn.apply(ctx, slice.call(args, 2));
+      }
+      nextTickProgress = false;
+    });
+  }
+
   // aa - async-await
   function aa(gtor) {
-    var ctx = this;
-    var args = slice.call(arguments, 1);
+    var ctx = this, args = slice.call(arguments, 1);
 
     // is generator function? then get generator.
-    if (isGeneratorFunction(gtor))
+    if (gtor instanceof GeneratorFunction)
       gtor = gtor.apply(ctx, args);
 
     // is promise? then do it.
@@ -69,7 +90,7 @@ this.aa = function () {
     var resolve, reject, p = PromiseThunk(
       function (res, rej) { resolve = res; reject = rej; });
 
-    startGtor(makeEnv(gtor));
+    nextTick(makeEnv(gtor).callback);
     return p;
 
     function makeEnv(gtor) {
@@ -92,18 +113,20 @@ this.aa = function () {
         if (ret.done)
           return resolve(ret.value);
 
-        nextTickDo(function () { doValue(ret.value, env); });
+        nextTick(doValue, null, ret.value, env);
       }
     }
 
     function doValue(value, env) {
-      if  (value == null || typeof value !== 'object' && typeof value !== 'function')
+      if  (value == null ||
+           typeof value !== 'object' &&
+           typeof value !== 'function')
         return env.callback(null, value);
 
-      if (isGeneratorFunction(value))
+      if (value instanceof GeneratorFunction)
         value = value.apply(ctx, args);
 
-      if (isGenerator(value))
+      if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
         return aa.call(ctx, value)(env.callback);
 
       if (value instanceof PromiseThunk)
@@ -116,7 +139,7 @@ this.aa = function () {
       if (typeof value === 'function')
         return value(env.callback);
 
-      var called;
+      var called = false;
 
       // array
       if (value instanceof Array) {
@@ -163,22 +186,6 @@ this.aa = function () {
       // other value
       else
         return env.callback(null, value);
-    }
-
-    // startGtor(env)
-    function startGtor(env) {
-      nextTickDo(function () {
-        try {
-          var ret = env.gtor.next();
-        } catch (err) {
-          return reject(err);
-        }
-
-        if (ret.done)
-          return resolve(ret.value);
-
-        nextTickDo(function () { doValue(ret.value, env); });
-      });
     }
   }
 
