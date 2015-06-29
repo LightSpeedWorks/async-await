@@ -45,9 +45,7 @@ this.aa = function () {
     typeof process === 'object' && process && typeof process.nextTick === 'function' ? process.nextTick :
     function nextTick(fn) { setTimeout(fn, 0); };
 
-  var aacount = 0;
-
-  // aa
+  // aa - async-await
   function aa(gtor) {
     var ctx = this;
     var args = slice.call(arguments, 1);
@@ -68,127 +66,120 @@ this.aa = function () {
     if (!isGenerator(gtor))
       return chan.apply(ctx, arguments);
 
-    var gtors = [];
+    var resolve, reject, p = PromiseThunk(
+      function (res, rej) { resolve = res; reject = rej; });
 
-    console.log('\x1b[32maa ******************** ' + (++aacount) + '\x1b[m');
+    startGtor(makeEnv(gtor));
+    return p;
 
-    var resolve2, reject2, p = PromiseThunk(
-      function (res, rej) { resolve2 = res; reject2 = rej; });
+    function makeEnv(gtor) {
+      var env = {gtor:gtor, callback:callback};
+      return env;
 
-    function resolve(val) {
-      gtor = gtors.pop();
-      if (!gtor) return resolve2(val);
-      return nextTickDo(function () { next(null, val); });
-    }
-
-    function reject(err) {
-      //if (!(err instanceof Error)) console.log('aa reject: ', typeof err, err.constructor.name, err);
-      gtor = gtors.pop();
-      if (!gtor) return reject2(err);
-      //console.log('@@@@' + err.stack);
-      return nextTickDo(function () { next(err); });
-    }
-
-    p.then(
-      function (val) {
-        console.log('\x1b[36maa -------------------- ' + (aacount--) + ' val: ' + val + '\x1b[m'); },
-      function (err) {
-        console.log('\x1b[35maa -------------------- ' + (aacount--) + ' err: ' + err + '\x1b[m'); });
-
-    function next(err, val) {
-      //console.log('\x1b[43merr&val', typeof err, err+'', typeof val, '\x1b[m');
-      try {
-        if (err) {
-          //if (!(err instanceof Error)) console.log('aa next err: ', typeof err, err.constructor.name, err);
-          if (typeof gtor['throw'] !== 'function')
-            return reject(err);
-          var ret = gtor['throw'](err);
+      function callback(err, val) {
+        try {
+          if (err) {
+            if (typeof gtor['throw'] !== 'function')
+              return reject(err);
+            var ret = gtor['throw'](err);
+          }
+          else
+            var ret = gtor.next(val);
+        } catch (err) {
+          return reject(err);
         }
-        else
-          var ret = gtor.next(val);
-      } catch (err) {
-        return reject(err);
+
+        if (ret.done)
+          return resolve(ret.value);
+
+        nextTickDo(function () { doValue(ret.value, env); });
       }
-
-      if (ret.done)
-        return resolve(ret.value);
-
-      nextTickDo(function () { doValue(ret.value, next); });
     }
 
-    function doValue(value, next) {
+    function doValue(value, env) {
       if  (value == null || typeof value !== 'object' && typeof value !== 'function')
-        return next(null, value);
+        return env.callback(null, value);
 
       if (isGeneratorFunction(value))
         value = value.apply(ctx, args);
 
       if (isGenerator(value))
-        return gtors.push(gtor), gtor = value, nextTickDo(next);
+        return aa.call(ctx, value)(env.callback);
 
       if (value instanceof PromiseThunk)
-        return value(next);
+        return value(env.callback);
 
       if (isPromise(value))
-        return value.then(function (val) { next(null, val); }, next);
+        return value.then(function (val) { env.callback(null, val); }, env.callback);
 
       // function must be a thunk
       if (typeof value === 'function')
-        return value(next);
+        return value(env.callback);
 
       var called;
 
       // array
       if (value instanceof Array) {
         var n = value.length;
-        if (n === 0) return next(null, []);
+        if (n === 0) return env.callback(null, []);
         var arr = Array(n);
         value.forEach(function (val, i) {
-          doValue(val, function (err, val) {
+          doValue(val, {gtor:env.gtor, callback:function (err, val) {
             if (err) {
               if (!called)
-                called = true, next(err);
+                called = true, env.callback(err);
             }
             else {
               arr[i] = val;
               if (--n === 0 && !called)
-                called = true, next(null, arr);
+                called = true, env.callback(null, arr);
             }
-          });
+          }});
         });
-      }
+      } // array
 
       // object
-      else if (value && typeof value === 'object') {
+      else if (value.constructor === Object) {
         var keys = Object.keys(value);
         var n = keys.length;
-        if (n === 0) return next(null, {});
+        if (n === 0) return env.callback(null, {});
         var obj = {};
         keys.forEach(function (key) {
           obj[key] = undefined;
-          doValue(value[key], function (err, val) {
+          doValue(value[key], {gtor:env.gtor, callback:function (err, val) {
             if (err) {
               if (!called)
-                called = true, next(err);
+                called = true, env.callback(err);
             }
             else {
               obj[key] = val;
               if (--n === 0 && !called)
-                called = true, next(null, obj);
+                called = true, env.callback(null, obj);
             }
-          });
+          }});
         });
-      }
+      } // object
 
       // other value
       else
-        throw new Error('aa: %%%%%%');
-      //  next(null, value);
+        return env.callback(null, value);
     }
 
-    nextTickDo(next);
+    // startGtor(env)
+    function startGtor(env) {
+      nextTickDo(function () {
+        try {
+          var ret = env.gtor.next();
+        } catch (err) {
+          return reject(err);
+        }
 
-    return p;
+        if (ret.done)
+          return resolve(ret.value);
+
+        nextTickDo(function () { doValue(ret.value, env); });
+      });
+    }
   }
 
   // isGeneratorFunction
