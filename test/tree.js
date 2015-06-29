@@ -24,25 +24,26 @@ this.tree = function () {
     var children = {};
 
     try {
+      var procName = 'tree: fs.readdir: ';
       var names = yield readdir(dir);
     } catch (err) {
-      console.log('tree: fs.readdir: ' + err);
-      children[$error] = 'tree fs readdir: ' + err;
+      console.log(procName + err);
+      children[$error] = procName + err;
       children[$path] = dir;
       return children;
     }
 
     var totalsize = 0;
-    var dirsize = 0;
 
-    names.forEach(function (name) { children[name] = null; });
+    var res = Array(names.length);
+    names.forEach(function (name, i) {
+      var file = path.resolve(dir, name);
+      res[i] = {name:name, file:file, stat:fs_stat(file)};
+    });
 
     try {
       // sync parallel: fs.stat
-      var res = yield names.map(function (name) {
-        var file = path.resolve(dir, name);
-        return {name:name, file:file, stat:fs_stat(file)}
-      });
+      res = yield res;
     } catch (err) {
       console.log('tree: fs_stat: ' + err);
       children[$error] = 'tree fs stat: ' + err;
@@ -52,24 +53,26 @@ this.tree = function () {
 
     try {
       // sync parallel: tree
-      res = yield res.map(function (elem) {
-        var name = elem.name;
-        var stat = elem.stat;
+      res.forEach(function (elem) {
+        elem.size = 0;
+        elem.child = null;
 
-        if (stat instanceof Error) {
-          console.log('tree: stat error: ' + stat);
-          return {name:name, size:0, child:null};
+        if (elem.stat instanceof Error) {
+          console.log('tree: stat error: ' + elem.stat);
+          return;
         }
 
-        var size = stat.size;
-        var file = elem.file;
+        elem.size = elem.stat.size;
 
-        var child = null;
-        if (stat.isDirectory())
-          child = tree(file, minSize, level + 1);
+        if (elem.stat.isDirectory()) {
+          elem.name += '/';
+          elem.child = tree(elem.file, minSize, level + 1);
+        }
 
-        return {name:name, size:size, child:child}
+        children[elem.name] = null;
       });
+
+      res = yield res;
     } catch (err) {
       console.log('tree: tree() ' + err.stack);
       children[$error] = err;
@@ -77,11 +80,8 @@ this.tree = function () {
       return children;
     }
 
-    if (!res || !res.map)
-      console.log('####', typeof res, res.constructor.name, res);
-
     // rest of process
-    res.map(function (elem) {
+    res.forEach(function (elem) {
       var name = elem.name;
       var size = elem.size;
       var child = elem.child;
@@ -99,9 +99,6 @@ this.tree = function () {
         children[name] = size;
 
       totalsize += size;
-      dirsize += size;
-
-      return {name:name, size:size, child:child};
     });
 
     children[$totalsize] = totalsize;
