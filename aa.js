@@ -11,6 +11,11 @@ this.aa = function () {
     var GeneratorFunction = Function('return function*(){}.constructor')();
   } catch (e) {}
 
+  // GeneratorFunctionPrototype
+  try {
+    var GeneratorFunctionPrototype = Function('return (function*(){})().constructor')();
+  } catch (e) {}
+
   var slice = [].slice;
 
   // defProp
@@ -188,12 +193,12 @@ this.aa = function () {
 
   // isGeneratorFunction
   function isGeneratorFunction(gtor) {
-    return !!gtor && gtor instanceof GeneratorFunction;
+    return gtor instanceof GeneratorFunction;
   }
 
   // isGenerator
   function isGenerator(gtor) {
-    return !!gtor && typeof gtor.next === 'function';
+    return gtor instanceof GeneratorFunctionPrototype || !!gtor && gtor.next === 'function';
   }
 
   if (typeof module === 'object' && module && module.exports)
