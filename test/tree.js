@@ -22,43 +22,28 @@ this.tree = function () {
     if (!level) level = 0;
 
     var children = {};
+    var totalsize = 0;
 
     try {
       var procName = 'tree: fs.readdir: ';
       var names = yield readdir(dir);
-    } catch (err) {
-      console.log(procName + err);
-      children[$error] = procName + err;
-      children[$path] = dir;
-      return children;
-    }
 
-    var totalsize = 0;
+      var res = names.map(function (name) {
+        var file = path.resolve(dir, name);
+        return {name:name, file:file, stat:fs_stat(file)};
+      });
 
-    var res = Array(names.length);
-    names.forEach(function (name, i) {
-      var file = path.resolve(dir, name);
-      res[i] = {name:name, file:file, stat:fs_stat(file)};
-    });
-
-    try {
       // sync parallel: fs.stat
+      procName = 'tree: fs_stat: ';
       res = yield res;
-    } catch (err) {
-      console.log('tree: fs_stat: ' + err);
-      children[$error] = 'tree fs stat: ' + err;
-      children[$path] = dir;
-      return children;
-    }
 
-    try {
-      // sync parallel: tree
+      procName = 'tree: check fs.stat: ';
       res.forEach(function (elem) {
         elem.size = 0;
         elem.child = null;
 
         if (elem.stat instanceof Error) {
-          console.log('tree: stat error: ' + elem.stat);
+          console.log('tree: fs.stat error: ' + elem.stat);
           return;
         }
 
@@ -72,36 +57,40 @@ this.tree = function () {
         children[elem.name] = null;
       });
 
+      // sync parallel: tree
+      procName = 'tree: tree() ';
       res = yield res;
+
+      // rest of process
+      procName = 'tree: after tree() ';
+      res.forEach(function (elem) {
+        var name = elem.name;
+        var size = elem.size;
+        var child = elem.child;
+
+        //if (child instanceof Error)
+        //  children[name] = size;
+        //else 
+        if (child && Number.isFinite(child[$totalsize])) {
+          if (child[$totalsize] >= minSize)
+            children[name] = child;
+          else
+            children[name] = child[$totalsize];
+          totalsize += child[$totalsize];
+        }
+        else
+          children[name] = size;
+
+        totalsize += size;
+      });
+
+      children[$totalsize] = totalsize;
+
     } catch (err) {
-      console.log('tree: tree() ' + err.stack);
-      children[$error] = err;
-      children[$path] = dir;
-      return children;
+      console.log(procName + err);
+      children[$error] = procName + err;
     }
 
-    // rest of process
-    res.forEach(function (elem) {
-      var name = elem.name;
-      var size = elem.size;
-      var child = elem.child;
-
-      if (child instanceof Error)
-        children[name] = size;
-      else if (child && typeof child[$totalsize] === 'number') {
-        if (child[$totalsize] >= minSize)
-          children[name] = child;
-        else
-          children[name] = child[$totalsize];
-        totalsize += child[$totalsize];
-      }
-      else
-        children[name] = size;
-
-      totalsize += size;
-    });
-
-    children[$totalsize] = totalsize;
     children[$path] = dir;
     return children;
   }
