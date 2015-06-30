@@ -12,10 +12,8 @@
   function coSleep(ms, val) {
     return function (fn) {
       setTimeout(function () {
-        if (val < 3)
-          fn(null, val);
-        else
-          fn(new Error('sleep error'));
+        if (val < 3) fn(null, val);
+        else         fn(new Error('sleep error'));
       }, ms);
     };
   }
@@ -23,10 +21,8 @@
   function promiseSleep(ms, val) {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        if (val < 3)
-          resolve(val);
-        else
-          reject(new Error('sleep error'));
+        if (val < 3) resolve(val);
+        else         reject(new Error('sleep error'));
       }, ms);
     });
   }
