@@ -282,8 +282,8 @@ this.aa = function () {
   } // Channel
 
   // send(val or err)
-  Channel.prototype.send = $$send;
-  function $$send(val) {
+  var $$send = Channel.prototype.send = send;
+  function send(val) {
     if (this.$isClosed)
       throw new Error('Cannot send to closed channel');
     else if (this.$recvCallbacks.length > 0)
@@ -293,8 +293,8 @@ this.aa = function () {
   } // send
 
   // recv(cb)
-  Channel.prototype.recv = $$recv;
-  function $$recv(cb) {
+  var $$recv = Channel.prototype.recv = recv;
+  function recv(cb) {
     if (this.done())
       cb(null, this.empty);
     else if (this.$sendValues.length > 0)
@@ -305,8 +305,8 @@ this.aa = function () {
   } // recv
 
   // done()
-  Channel.prototype.done = $$done;
-  function $$done() {
+  var $$done = Channel.prototype.done = done;
+  function done() {
     if (!this.$isDone && this.$isClosed && this.$sendValues.length === 0) {
       this.$isDone = true;
       // complete each pending callback with the empty value
@@ -318,20 +318,19 @@ this.aa = function () {
   } // done
 
   // close() end()
-  Channel.prototype.close = $$close;
-  Channel.prototype.end = $$close;
-  function $$close() {
+  var $$close = Channel.prototype.close = Channel.prototype.end = close;
+  function close() {
     this.$isClosed = true;
     return this.done();
   } // close
 
-  // stream(stream)
-  Channel.prototype.stream = $$stream;
-  function $$stream(stream) {
+  // stream(reader)
+  var $$stream = Channel.prototype.stream = stream;
+  function stream(reader) {
     var channel = this;
-    stream.on('end',      close);
-    stream.on('error',    error);
-    stream.on('readable', readable);
+    reader.on('end',      close);
+    reader.on('error',    error);
+    reader.on('readable', readable);
     return this;
 
     function close()    { return channel.close(); }
@@ -353,6 +352,13 @@ this.aa = function () {
   } // complete
 
 
+  function wait(ms) {
+    return function (cb) {
+      setTimeout(cb, ms);
+    };
+  };
+
+
   if (typeof module === 'object' && module && module.exports)
     module.exports = aa;
 
@@ -362,8 +368,8 @@ this.aa = function () {
   aa.isGeneratorFunction = isGeneratorFunction;
   aa.isGenerator         = isGenerator;
   aa.aa                  = aa;
-  aa.chan                = Channel;
-  aa.Channel             = Channel;
+  aa.chan = aa.Channel   = Channel;
+  aa.wait                = wait;
 
   if (Object.getOwnPropertyNames)
     Object.getOwnPropertyNames(PromiseThunk).forEach(function (prop) {
