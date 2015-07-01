@@ -30,15 +30,22 @@ this.tree = function () {
         switch (typeof child) {
           case 'number':
             totalsize += child;
+            children[name] = child;
             break;
           case 'string':
             break;
+            children[name + '?'] = child;
           case 'object':
-            if (Number.isFinite(child[$totalsize]))
-              totalsize += child[$totalsize];
+            var size = child[$totalsize];
+            if (Number.isFinite(size)) {
+              totalsize += size;
+              if (size < minSize)
+                children[name + '/'] = size;
+              else
+                children[name + '/'] = child;
+            }
             break;
         }
-        children[name + postfix[typeof child]] = child;
       });
       children[$path] = file;
       children[$totalsize] = totalsize;
