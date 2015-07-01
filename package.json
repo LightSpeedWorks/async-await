@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "aa - Async-Await. co like library, go like channel, thunkify or promisefy wrap package",
   "main": "aa.js",
   "dependencies": {
