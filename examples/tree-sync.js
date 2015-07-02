@@ -19,36 +19,36 @@ this.tree = function () {
     if (!minSize) minSize = 0;
     if (!level)   level = 0;
 
-    var stat = fs.statSync(file);
-
-    if (!stat.isDirectory())
-      return stat.size;
-
     var children = {};
-    var totalsize = 0;
-    var names = fs.readdirSync(file);
-    names.forEach(function (name) {
-      var child = tree(path.resolve(file, name), minSize, level + 1);
-      switch (typeof child) {
-        case 'number':
+    try {
+      var stat = fs.statSync(file);
+      if (!stat.isDirectory())
+        return stat.size;
+
+      var totalsize = 0;
+
+      var names = fs.readdirSync(file);
+      names.forEach(function (name) {
+        var child = tree(path.resolve(file, name), minSize, level + 1);
+        if (typeof child === 'number') {
           totalsize += child;
           children[name] = child;
-          break;
-        case 'object':
+        }
+        else {
           var size = child[$totalsize];
-          if (Number.isFinite(size)) {
-            totalsize += size;
-            if (size < minSize)
-              children[name + '/'] = size;
-            else
-              children[name + '/'] = child;
-          }
-          break;
-      }
-    });
-    children[$path] = file;
-    children[$totalsize] = totalsize;
-    return children;
+          if (Number.isFinite(size)) totalsize += size;
+          children[name + '/'] = size < minSize ? size : child;
+        }
+      }); // names.forEach
+
+      children[$path] = file;
+      children[$totalsize] = totalsize;
+      return children;
+    } catch (err) {
+      children[$path] = file;
+      children[$error] = err + '';
+      return children;
+    }
   } // tree
 
 
@@ -60,6 +60,9 @@ this.tree = function () {
 
     // main
     if (require.main === module) {
+      if (!process.argv[2])
+        return console.log('usage: iojs %s {path} [min-size]',
+          process.argv[1])
       var file = path.resolve(process.argv[2] || '.');
       var minSize = eval(process.argv[3]) || 0;
       console.log('tree main:', file);
