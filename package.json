@@ -6,7 +6,9 @@
   "dependencies": {
     "promise-thunk": ">=0.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "promise-light": ">=0.1.4"
+  },
   "keywords": [
     "chan",
     "co",
