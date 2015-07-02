@@ -40,21 +40,14 @@ this.tree = function () {
         tree(path.resolve(file, name), minSize, level + 1, function (err, child) {
           if (err) return cb(err);
 
-          switch (typeof child) {
-            case 'number':
-              totalsize += child;
-              children[name] = child;
-              break;
-            case 'object':
-              var size = child[$totalsize];
-              if (Number.isFinite(size)) {
-                totalsize += size;
-                if (size < minSize)
-                  children[name + '/'] = size;
-                else
-                  children[name + '/'] = child;
-              }
-              break;
+          if (typeof child === 'number') {
+            totalsize += child;
+            children[name] = child;
+          }
+          else {
+            var size = child[$totalsize];
+            if (Number.isFinite(size)) totalsize += size;
+            children[name + '/'] = size < minSize ? size : child;
           }
           if (--n === 0) last();
 
@@ -81,6 +74,9 @@ this.tree = function () {
 
     // main
     if (require.main === module) {
+      if (!process.argv[2])
+        return console.log('usage: iojs %s {path} [min-size]',
+          process.argv[1])
       var file = path.resolve(process.argv[2] || '.');
       var minSize = eval(process.argv[3]) || 0;
       console.log('tree main:', file);
