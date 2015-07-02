@@ -44,16 +44,36 @@ this.aa = function () {
     function setProto(obj, proto) { obj.__proto__ = proto; } : null;
 
 
+  // Queue
+  function Queue() {
+    this.tail = this.head = null;
+  }
+  Queue.prototype.push = function push(x) {
+    if (this.tail)
+      this.tail = this.tail[1] = [x, null];
+    else
+      this.tail = this.head = [x, null];
+  };
+  Queue.prototype.shift = function shift() {
+    if (!this.head) return null;
+    var x = this.head[0];
+    this.head = this.head[1];
+    if (!this.head) this.tail = null;
+    return x;
+  };
+
+
   // nextTickDo(fn)
   var nextTickDo = typeof setImmediate === 'function' ? setImmediate :
     typeof process === 'object' && process && typeof process.nextTick === 'function' ? process.nextTick :
     function nextTick(fn) { setTimeout(fn, 0); };
 
-  var tasks = [];
+  var tasks = new Queue();
+
   var nextTickProgress = false;
 
-  // nextTick(fn, ctx, ...args)
-  function nextTick(fn, ctx, args) {
+  // nextTick(fn, ...args)
+  function nextTick(fn) {
     if (typeof fn !== 'function')
       throw new TypeError('fn must be a function');
 
@@ -61,12 +81,12 @@ this.aa = function () {
     if (nextTickProgress) return;
 
     nextTickProgress = true;
+
     nextTickDo(function () {
       var args;
-      while (args = tasks.shift()) {
-        var fn = args[0], ctx = args[1];
-        fn.apply(ctx, slice.call(args, 2));
-      }
+      while (args = tasks.shift())
+        args[0](args[1], args[2]);
+
       nextTickProgress = false;
     });
   }
@@ -114,7 +134,7 @@ this.aa = function () {
       if (ret.done)
         return resolve(ret.value);
 
-      nextTick(doValue, null, ret.value, callback);
+      nextTick(doValue, ret.value, callback);
     }
 
     function doValue(value, callback) {
