@@ -1,4 +1,4 @@
-// tree.js
+// tree-sync.js
 
 this.tree = function () {
   'use strict';
@@ -61,8 +61,9 @@ this.tree = function () {
     // main
     if (require.main === module) {
       var file = path.resolve(process.argv[2] || '.');
+      var minSize = eval(process.argv[3]) || 0;
       console.log('tree main:', file);
-      var val = tree(file, eval(process.argv[3]) || 0);
+      var val = tree(file, minSize, 0);
       console.log(inspect(val));
     }
 
