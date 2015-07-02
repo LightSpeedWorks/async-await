@@ -85,7 +85,7 @@ this.aa = function () {
     nextTickDo(function () {
       var args;
       while (args = tasks.shift())
-        args[0](args[1], args[2]);
+        args[0](args[1], args[2], args[3], args[4]);
 
       nextTickProgress = false;
     });
@@ -134,10 +134,13 @@ this.aa = function () {
       if (ret.done)
         return resolve(ret.value);
 
-      nextTick(doValue, ret.value, callback);
+      nextTick(doValue, ret.value, callback, ctx, args);
     }
 
-    function doValue(value, callback) {
+  }
+
+
+    function doValue(value, callback, ctx, args) {
       if  (value == null ||
            typeof value !== 'object' &&
            typeof value !== 'function')
@@ -207,7 +210,6 @@ this.aa = function () {
       else
         return callback(null, value);
     }
-  }
 
 
   // isGeneratorFunction
