@@ -152,15 +152,12 @@ this.aa = function () {
     if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
       return aa.call(ctx, value)(callback);
 
-    if (value instanceof PromiseThunk)
+    // function must be a thunk
+    if (typeof value === 'function')
       return value(callback);
 
     if (isPromise(value))
       return value.then(function (val) { callback(null, val); }, callback);
-
-    // function must be a thunk
-    if (typeof value === 'function')
-      return value(callback);
 
     var called = false;
 
