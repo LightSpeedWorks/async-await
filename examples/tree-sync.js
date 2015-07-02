@@ -11,7 +11,6 @@ this.tree = function () {
   var INDENT = '  ';
 
   var counter = 0;
-  var postfix = {number: '', string:'?', object:'/'};
 
   //*****************************************************
   function tree(file, minSize, level) {
@@ -21,42 +20,35 @@ this.tree = function () {
 
     var stat = fs.statSync(file);
 
-    if (stat.isDirectory()) {
-      var children = {};
-      var totalsize = 0;
-      var names = fs.readdirSync(file);
-      names.forEach(function (name) {
-        var child = tree(path.resolve(file, name), minSize, level + 1);
-        switch (typeof child) {
-          case 'number':
-            totalsize += child;
-            children[name] = child;
-            break;
-          case 'string':
-            break;
-            children[name + '?'] = child;
-          case 'object':
-            var size = child[$totalsize];
-            if (Number.isFinite(size)) {
-              totalsize += size;
-              if (size < minSize)
-                children[name + '/'] = size;
-              else
-                children[name + '/'] = child;
-            }
-            break;
-        }
-      });
-      children[$path] = file;
-      children[$totalsize] = totalsize;
-      return children;
-    }
-    else if (stat.isFile())
+    if (!stat.isDirectory())
       return stat.size;
-    else
-      return '!file && !directory';
 
-  }
+    var children = {};
+    var totalsize = 0;
+    var names = fs.readdirSync(file);
+    names.forEach(function (name) {
+      var child = tree(path.resolve(file, name), minSize, level + 1);
+      switch (typeof child) {
+        case 'number':
+          totalsize += child;
+          children[name] = child;
+          break;
+        case 'object':
+          var size = child[$totalsize];
+          if (Number.isFinite(size)) {
+            totalsize += size;
+            if (size < minSize)
+              children[name + '/'] = size;
+            else
+              children[name + '/'] = child;
+          }
+          break;
+      }
+    });
+    children[$path] = file;
+    children[$totalsize] = totalsize;
+    return children;
+  } // tree
 
 
   //*****************************************************
