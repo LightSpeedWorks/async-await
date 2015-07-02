@@ -7,8 +7,8 @@ this.tree = function () {
   var path = require('path');
   var inspect = require('./my-inspect').inspect;
 
-  //var aa = require('../aa');
-  var aa = require('./aa2');
+  var aa = require('../aa');
+  //var aa = require('./aa2');
   //var aa = require('co');
   var thunkify = require('../aa').thunkify;
   var fs_stat = thunkify(fs.stat);
@@ -18,13 +18,15 @@ this.tree = function () {
   var $error = '*error*';
   var $path = '*path*';
 
-  var counter = 0;
+  var currentPath = '';
 
   //*****************************************************
   function *tree(file, minSize, level) {
     if (!file)    file = '.';
     if (!minSize) minSize = 0;
     if (!level)   level = 0;
+
+    currentPath = file;
 
     var children = {};
     try {
@@ -78,6 +80,12 @@ this.tree = function () {
       var file = path.resolve(process.argv[2] || '.');
       var minSize = eval(process.argv[3]) || 0;
       console.log('tree main:', file);
+      require('control-c')(
+        function () {
+          console.error(currentPath);
+          console.error('time: %d sec', (Date.now() - startTime) / 1000.0);
+        },
+        function () { process.exit(); });
       var startTime = Date.now();
       aa(function *() {
         var val = yield tree(file, minSize, 0);
