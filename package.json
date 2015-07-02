@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "co": ">=4.5.4",
+    "control-c": ">=0.0.5",
     "promise-light": ">=0.1.4"
   },
   "keywords": [
