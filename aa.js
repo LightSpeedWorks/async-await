@@ -140,76 +140,76 @@ this.aa = function () {
   }
 
 
-    function doValue(value, callback, ctx, args) {
-      if  (value == null ||
-           typeof value !== 'object' &&
-           typeof value !== 'function')
-        return callback(null, value);
+  function doValue(value, callback, ctx, args) {
+    if  (value == null ||
+         typeof value !== 'object' &&
+         typeof value !== 'function')
+      return callback(null, value);
 
-      if (value instanceof GeneratorFunction)
-        value = value.apply(ctx, args);
+    if (value instanceof GeneratorFunction)
+      value = value.apply(ctx, args);
 
-      if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
-        return aa.call(ctx, value)(callback);
+    if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
+      return aa.call(ctx, value)(callback);
 
-      if (value instanceof PromiseThunk)
-        return value(callback);
+    if (value instanceof PromiseThunk)
+      return value(callback);
 
-      if (isPromise(value))
-        return value.then(function (val) { callback(null, val); }, callback);
+    if (isPromise(value))
+      return value.then(function (val) { callback(null, val); }, callback);
 
-      // function must be a thunk
-      if (typeof value === 'function')
-        return value(callback);
+    // function must be a thunk
+    if (typeof value === 'function')
+      return value(callback);
 
-      var called = false;
+    var called = false;
 
-      // array
-      if (value instanceof Array) {
-        var n = value.length;
-        if (n === 0) return callback(null, []);
-        var arr = Array(n);
-        value.forEach(function (val, i) {
-          doValue(val, function (err, val) {
-            if (err) {
-              if (!called)
-                called = true, callback(err);
-            }
-            else {
-              arr[i] = val;
-              if (--n === 0 && !called)
-                called = true, callback(null, arr);
-            }
-          });
+    // array
+    if (value instanceof Array) {
+      var n = value.length;
+      if (n === 0) return callback(null, []);
+      var arr = Array(n);
+      value.forEach(function (val, i) {
+        doValue(val, function (err, val) {
+          if (err) {
+            if (!called)
+              called = true, callback(err);
+          }
+          else {
+            arr[i] = val;
+            if (--n === 0 && !called)
+              called = true, callback(null, arr);
+          }
         });
-      } // array
+      });
+    } // array
 
-      // object
-      else if (value.constructor === Object) {
-        var keys = Object.keys(value);
-        var n = keys.length;
-        if (n === 0) return callback(null, {});
-        var obj = {};
-        keys.forEach(function (key) {
-          obj[key] = undefined;
-          doValue(value[key], function (err, val) {
-            if (err) {
-              if (!called)
-                called = true, callback(err);
-            }
-            else {
-              obj[key] = val;
-              if (--n === 0 && !called)
-                called = true, callback(null, obj);
-            }
-          });
+    // object
+    else if (value.constructor === Object) {
+      var keys = Object.keys(value);
+      var n = keys.length;
+      if (n === 0) return callback(null, {});
+      var obj = {};
+      keys.forEach(function (key) {
+        obj[key] = undefined;
+        doValue(value[key], function (err, val) {
+          if (err) {
+            if (!called)
+              called = true, callback(err);
+          }
+          else {
+            obj[key] = val;
+            if (--n === 0 && !called)
+              called = true, callback(null, obj);
+          }
         });
-      } // object
+      });
+    } // object
 
-      // other value
-      else
-        return callback(null, value);
-    }
+    // other value
+    else
+      return callback(null, value);
+  }
 
 
   // isGeneratorFunction
