@@ -84,9 +84,11 @@ this.tree = function () {
       var file = path.resolve(process.argv[2] || '.');
       var minSize = eval(process.argv[3]) || 0;
       console.log('tree main:', file);
+      var startTime = Date.now();
       var val = tree(file, minSize, 0, function (err, val) {
         if (err) console.log(err);
         else console.log(inspect(val));
+        console.log('time: %d sec', (Date.now() - startTime) / 1000.0);
       });
     }
 
