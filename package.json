@@ -7,6 +7,7 @@
     "promise-thunk": ">=0.0.3"
   },
   "devDependencies": {
+    "co": ">=4.5.4",
     "promise-light": ">=0.1.4"
   },
   "keywords": [
