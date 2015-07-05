@@ -16,6 +16,9 @@ INSTALL:
 $ npm install aa
 ```
 
+[![NPM](https://nodei.co/npm/aa.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aa/)
+[![NPM](https://nodei.co/npm-dl/aa.png?height=2)](https://nodei.co/npm/aa/)
+
 
 PREPARE:
 ----
