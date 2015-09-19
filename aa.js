@@ -151,7 +151,7 @@ this.aa = function () {
     if (value instanceof GeneratorFunction)
       value = value.apply(ctx, args);
 
-    if (value instanceof GeneratorFunctionPrototype || isGenerator(value))
+    if ((value && value.constructor === GeneratorFunctionPrototype) || isGenerator(value))
       return aa.call(ctx, value)(callback);
 
     // function must be a thunk
@@ -218,7 +218,7 @@ this.aa = function () {
 
   // isGenerator
   function isGenerator(gtor) {
-    return gtor instanceof GeneratorFunctionPrototype || !!gtor && gtor.next === 'function';
+    return !!gtor && (gtor.constructor === GeneratorFunctionPrototype || gtor.next === 'function');
   }
 
 
