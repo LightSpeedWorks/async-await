@@ -1,9 +1,8 @@
 // aa.js - async-await.js
 
-this.aa = function () {
+this.aa = function (PromiseThunk) {
   'use strict';
 
-  var PromiseThunk = require('promise-thunk');
   var isPromise = PromiseThunk.isPromise;
   var wrap = PromiseThunk.wrap;
 
@@ -404,4 +403,4 @@ this.aa = function () {
 
   return aa;
 
-}();
+}(this.PromiseThunk || require('promise-thunk'));
