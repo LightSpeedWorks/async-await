@@ -98,7 +98,7 @@ this.aa = function (PromiseThunk) {
     var ctx = this, args = slice.call(arguments, 1);
 
     // is generator function? then get generator.
-    if (gtor instanceof GeneratorFunction)
+    if (gtor && gtor.constructor === GeneratorFunction)
       gtor = gtor.apply(ctx, args);
 
     // is promise? then do it.
@@ -142,15 +142,15 @@ this.aa = function (PromiseThunk) {
 
 
   function doValue(value, callback, ctx, args) {
-    if  (value == null ||
+    if (value == null ||
          typeof value !== 'object' &&
          typeof value !== 'function')
       return callback(null, value);
 
-    if (value instanceof GeneratorFunction)
+    if (value.constructor === GeneratorFunction)
       value = value.apply(ctx, args);
 
-    if ((value && value.constructor === GeneratorFunctionPrototype) || isGenerator(value))
+    if (value.constructor === GeneratorFunctionPrototype || isGenerator(value))
       return aa.call(ctx, value)(callback);
 
     // function must be a thunk
@@ -212,7 +212,7 @@ this.aa = function (PromiseThunk) {
 
   // isGeneratorFunction
   function isGeneratorFunction(gtor) {
-    return gtor instanceof GeneratorFunction;
+    return !!gtor && gtor.constructor === GeneratorFunction;
   }
 
   // isGenerator
