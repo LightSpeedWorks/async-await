@@ -8,11 +8,9 @@ this.tree = function () {
   var inspect = require('./my-inspect').inspect;
 
   var aa = require('../aa');
-  //var aa = require('./aa2');
   //var aa = require('co');
-  var thunkify = require('../aa').thunkify;
-  var fs_stat = thunkify(fs.stat);
-  var fs_readdir = thunkify(fs.readdir);
+  var fs_stat = aa(fs.stat);
+  var fs_readdir = aa(fs.readdir);
 
   var $totalsize = '*totalsize*';
   var $error = '*error*';
