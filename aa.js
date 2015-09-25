@@ -98,8 +98,7 @@ this.aa = function (PromiseThunk) {
     var ctx = this, args = slice.call(arguments, 1);
 
     // is generator function? then get generator.
-    if (gtor && (gtor.constructor === GeneratorFunction ||
-        gtor.constructor.name === 'GeneratorFunction'))
+    if (isGeneratorFunction(gtor))
       gtor = gtor.apply(ctx, args);
 
     // is promise? then do it.
@@ -148,13 +147,10 @@ this.aa = function (PromiseThunk) {
          typeof value !== 'function')
       return callback(null, value);
 
-    if (value.constructor === GeneratorFunction ||
-        value.constructor.name === 'GeneratorFunction')
+    if (isGeneratorFunction(value))
       value = value.apply(ctx, args);
 
-    if (value.constructor === GeneratorFunctionPrototype ||
-        value.constructor.name === 'GeneratorFunctionPrototype' ||
-        isGenerator(value))
+    if (isGenerator(value))
       return aa.call(ctx, value)(callback);
 
     // function must be a thunk
@@ -216,15 +212,19 @@ this.aa = function (PromiseThunk) {
 
   // isGeneratorFunction
   function isGeneratorFunction(gtor) {
-    return !!gtor && (gtor.constructor === GeneratorFunction ||
-      gtor.constructor.name === 'GeneratorFunction');
+    if (!gtor) return false;
+    var ctor = gtor.constructor;
+    return ctor === GeneratorFunction ||
+      (ctor.displayName || ctor.name) === 'GeneratorFunction';
   }
 
   // isGenerator
   function isGenerator(gtor) {
-    return !!gtor && (gtor.constructor === GeneratorFunctionPrototype ||
-      gtor.constructor.name === 'GeneratorFunctionPrototype' ||
-      gtor.next === 'function');
+    if (!gtor) return false;
+    var ctor = gtor.constructor;
+    return ctor === GeneratorFunctionPrototype ||
+      (ctor.displayName || ctor.name) === 'GeneratorFunctionPrototype' ||
+      typeof gtor.next === 'function';
   }
 
 
