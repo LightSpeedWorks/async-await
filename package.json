@@ -9,7 +9,7 @@
   "devDependencies": {
     "co": ">=4.6.0",
     "control-c": ">=0.0.9",
-    "promise-light": ">=0.1.6"
+    "promise-light": ">=0.1.7"
   },
   "keywords": [
     "chan",
