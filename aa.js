@@ -4,7 +4,7 @@ this.aa = function (PromiseThunk) {
   'use strict';
 
   var isPromise = PromiseThunk.isPromise;
-  var wrap = PromiseThunk.wrap;
+  var promisify = PromiseThunk.promisify;
 
   // GeneratorFunction
   try {
@@ -105,9 +105,9 @@ this.aa = function (PromiseThunk) {
     if (isPromise(gtor))
       return PromiseThunk(gtor);
 
-    // is function? then wrap it.
+    // is function? then promisify it.
     if (typeof gtor === 'function')
-      return wrap.call(ctx, gtor);
+      return promisify.call(ctx, gtor);
 
     // is not generator?
     if (!isGenerator(gtor))

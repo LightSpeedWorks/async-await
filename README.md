@@ -34,6 +34,8 @@ USAGE:
   Quick sample code: [aa-readme-example.js](examples/aa-readme-example.js#readme)
 
 ```bash
+$ node aa-readme-example.js
+  or
 $ iojs aa-readme-example.js
 ```
 
@@ -58,15 +60,16 @@ $ iojs aa-readme-example.js
       sleep.apply(null, args.concat(cb));
     };
   }
+  // var delay = aa.thunkify(sleep);
 
   delay(1100)(
     function (err, val) { console.log('1100 ms OK'); }
   );
 
 
-  // aa(fn) | aa.wrap(fn) : returns wrapped function a.k.a thunkify and promisefy
-  // wait(ms, args,...)   : returns promise & thunk
-  var wait = aa(sleep);
+  // aa.promisify(fn)   : returns wrapped function a.k.a thunkify and promisify
+  // wait(ms, args,...) : returns promise & thunk
+  var wait = aa.promisify(sleep);
 
   // wait() : as a thunk
   wait(1200)(
@@ -122,12 +125,12 @@ $ iojs aa-readme-example.js
 
 
     // make channel for sync - fork and join
-    var chan = aa(); // or aa.chan()
+    var chan = aa.chan();
 
-    sleep(300, 20, chan);   // send value to channel
-    sleep(200, 10, chan);   // send value to channel
-    var a = yield chan;     // recv value from channel
-    var b = yield chan;     // recv value from channel
+    sleep(300, 20, chan);   // send value to channel : fork or spread
+    sleep(200, 10, chan);   // send value to channel : fork or spread
+    var a = yield chan;     // recv value from channel : join or sync
+    var b = yield chan;     // recv value from channel : join or sync
     console.log('10 20:', a, b);
 
 
@@ -135,19 +138,19 @@ $ iojs aa-readme-example.js
     aa(function *() {
       yield wait(200);      // wait 200 ms
       return 200;
-    })(chan);               // send 200 to channel
+    })(chan);               // send 200 to channel : join or sync
 
     // fork thread -  make new thread and start
     aa(function *() {
       yield wait(100);      // wait 100 ms
       return 100;
-    })(chan);               // send 100 to channel
+    })(chan);               // send 100 to channel : join or sync
 
     // fork thread -  make new thread and start
     aa(function *() {
       yield wait(300);      // wait 300
       return 300;
-    })(chan);               // send 300 to channel
+    })(chan);               // send 300 to channel : join or sync
 
     // join threads - sync threads
     var x = yield chan;     // wait & recv first  value from channel
@@ -157,7 +160,7 @@ $ iojs aa-readme-example.js
 
 
     // communicate with channels
-    var chan1 = aa(), chan2 = aa();
+    var chan1 = aa.chan(), chan2 = aa.chan();
 
     // thread 1: send to chan1, recv from chan2
     aa(function *() {
