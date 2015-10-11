@@ -1,9 +1,9 @@
 'use strict';
 
-var thunkify = require('co-thunkify');
+var thunkify = require('./thunkify');
 
 var fs = require('fs');
-var aa = require('aa');
+var aa = require('../aa');
 
 var timer = thunkify(function (ms, cb) {
   return setTimeout(cb, ms);

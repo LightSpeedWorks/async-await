@@ -1,6 +1,6 @@
-iojs thunkify-new
-iojs thunkify-old
-iojs thunkify-test
-iojs thunkify-timer-test
-iojs thunkify
-pause
+node thunkify
+node thunkify-new
+node thunkify-old
+node thunkify-test
+node thunkify-timer-test
+@pause
