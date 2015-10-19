@@ -1,6 +1,6 @@
 {
   "name": "aa",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "aa - Async-Await. co like library, go like channel, thunkify or promisefy wrap package",
   "main": "aa.js",
   "dependencies": {
@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "LightSpeedWorks/aa"
+    "url": "LightSpeedWorks/async-await"
   },
   "bugs": {
-    "url": "https://github.com/LightSpeedWorks/aa/issues"
+    "url": "https://github.com/LightSpeedWorks/async-await/issues"
   },
-  "homepage": "https://github.com/LightSpeedWorks/aa#readme",
+  "homepage": "https://github.com/LightSpeedWorks/async-await#readme",
   "scripts": {
     "test": "mocha"
   }
