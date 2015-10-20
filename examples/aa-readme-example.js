@@ -86,7 +86,7 @@
 
 
     // make channel for sync - fork and join
-    var chan = aa.chan();
+    var chan = aa.Channel();
 
     sleep(300, 20, chan);   // send value to channel : fork or spread
     sleep(200, 10, chan);   // send value to channel : fork or spread
@@ -121,7 +121,7 @@
 
 
     // communicate with channels
-    var chan1 = aa.chan(), chan2 = aa.chan();
+    var chan1 = aa.Channel(), chan2 = aa.Channel();
 
     // thread 1: send to chan1, recv from chan2
     aa(function *() {

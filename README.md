@@ -1,7 +1,7 @@
-[aa](https://www.npmjs.com/package/aa) - async await
+[aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
 ====
 
-  [aa](https://www.npmjs.com/package/aa) - Async-Await library.<br/>
+  [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await) library.<br/>
   co like library, go like channel, thunkify or promisefy wrap package.
 
   using ES6 (ES2015) generator function.
@@ -18,6 +18,8 @@ $ npm install aa
 
 [![NPM](https://nodei.co/npm/aa.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aa/)
 [![NPM](https://nodei.co/npm-dl/aa.png?height=2)](https://nodei.co/npm/aa/)
+[![NPM](https://nodei.co/npm/async-await.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/async-await/)
+[![NPM](https://nodei.co/npm-dl/async-await.png?height=2)](https://nodei.co/npm/async-await/)
 
 
 PREPARE:
@@ -25,6 +27,8 @@ PREPARE:
 
 ```js
   var aa = require('aa');
+  // or
+  var aa = require('async-await');
 ```
 
 
@@ -125,7 +129,7 @@ $ iojs aa-readme-example.js
 
 
     // make channel for sync - fork and join
-    var chan = aa.chan();
+    var chan = aa.Channel();
 
     sleep(300, 20, chan);   // send value to channel : fork or spread
     sleep(200, 10, chan);   // send value to channel : fork or spread
@@ -160,7 +164,7 @@ $ iojs aa-readme-example.js
 
 
     // communicate with channels
-    var chan1 = aa.chan(), chan2 = aa.chan();
+    var chan1 = aa.Channel(), chan2 = aa.Channel();
 
     // thread 1: send to chan1, recv from chan2
     aa(function *() {
