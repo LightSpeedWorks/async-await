@@ -14,6 +14,8 @@ INSTALL:
 
 ```bash
 $ npm install aa
+   or
+$ npm install async-await
 ```
 
 [![NPM](https://nodei.co/npm/aa.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aa/)
@@ -35,12 +37,212 @@ PREPARE:
 USAGE:
 ----
 
-  Quick sample code: [aa-readme-example.js](examples/aa-readme-example.js#readme)
+### Example 1 sequential: [aa-readme-ex01-seq.js](examples/aa-readme-ex01-seq.js#readme)
+
+```bash
+$ node aa-readme-ex01-seq.js
+```
+
+```js
+	var aa = require('aa');
+
+
+	aa(main);
+
+
+	function *main() {
+		console.log('11:', yield asyncPromise(100, 11));
+		console.log('12:', yield asyncThunk(100, 12));
+		console.log('13:', yield asyncGenerator(100, 13));
+		yield sub(20);
+		yield sub(30);
+	}
+
+
+	function *sub(base) {
+		console.log('%s: %s', base + 1, yield asyncPromise(100, base + 1));
+		console.log('%s: %s', base + 2, yield asyncThunk(100, base + 2));
+		console.log('%s: %s', base + 3, yield asyncGenerator(100, base + 3));
+	}
+
+
+	// asyncPromise(ms, arg) : promise
+	function asyncPromise(ms, arg) {
+		return new Promise(function (res, rej) {
+			setTimeout(function () { res(arg); }, ms);
+		});
+	}
+
+
+	// asyncThunk(ms, arg) : thunk
+	function asyncThunk(ms, arg) {
+		return function (cb) {
+			setTimeout(function () { cb(null, arg); }, ms);
+		};
+	}
+
+
+	// asyncGenerator(ms, arg) : generator
+	function *asyncGenerator(ms, arg) {
+		var chan = aa.Channel();
+		setTimeout(function () { chan(arg); }, ms);
+		return yield chan;
+	}
+```
+
+
+### Example 2 parallel: [aa-readme-ex02-par.js](examples/aa-readme-ex02-par.js#readme)
+
+```bash
+$ node aa-readme-ex02-par.js
+```
+
+```js
+	var aa = require('aa');
+
+
+	aa(main);
+
+
+	function *main() {
+		console.log('[11, 12, 13]:', yield [
+			asyncPromise(100, 11),
+			asyncThunk(100, 12),
+			asyncGenerator(100, 13)
+		]);
+
+		console.log('{x:11, y:12, z:13}:', yield {
+			x: asyncPromise(100, 11),
+			y: asyncThunk(100, 12),
+			z: asyncGenerator(100, 13)
+		});
+
+		yield [sub(20), sub(30)];
+	}
+
+
+	function *sub(base) {
+		console.log('%s: %s', base + 1, yield asyncPromise(100, base + 1));
+		console.log('%s: %s', base + 2, yield asyncThunk(100, base + 2));
+		console.log('%s: %s', base + 3, yield asyncGenerator(100, base + 3));
+	}
+
+
+	// asyncPromise(ms, arg) : promise
+	function asyncPromise(ms, arg) {
+		return new Promise(function (res, rej) {
+			setTimeout(function () { res(arg); }, ms);
+		});
+	}
+
+
+	// asyncThunk(ms, arg) : thunk
+	function asyncThunk(ms, arg) {
+		return function (cb) {
+			setTimeout(function () { cb(null, arg); }, ms);
+		};
+	}
+
+
+	// asyncGenerator(ms, arg) : generator
+	function *asyncGenerator(ms, arg) {
+		var chan = aa.Channel();
+		setTimeout(function () { chan(arg); }, ms);
+		return yield chan;
+	}
+```
+
+
+### Example promisify: [aa-readme-ex11-promisify.js](examples/aa-readme-ex11-promisify.js#readme)
+
+```bash
+$ node aa-readme-ex11-promisify.js
+```
+
+```js
+	var aa = require('aa');
+	var promisify = aa.promisify;
+	var asyncPromise = promisify(asyncCallback);
+
+
+	aa(main);
+
+
+	function *main() {
+		console.log('11:', yield asyncPromise(100, 11));
+		console.log('12:', yield asyncPromise(100, 12));
+		console.log('13:', yield asyncPromise(100, 13));
+
+		asyncPromise(100, 21)
+		.then(function (val) {
+			console.log('21:', val);
+			return asyncPromise(100, 22);
+		})
+		.then(function (val) {
+			console.log('22:', val);
+			return asyncPromise(100, 23);
+		})
+		.then(function (val) {
+			console.log('23:', val);
+		});
+	}
+
+
+	// asyncCallback(ms, arg. cb) : node style normal callback
+	// cb : function (err, val)
+	function asyncCallback(ms, arg, cb) {
+		setTimeout(function () { cb(null, arg); }, ms);
+	}
+```
+
+
+### Example thunkify: [aa-readme-ex12-thunkify.js](examples/aa-readme-ex12-thunkify.js#readme)
+
+```bash
+$ node aa-readme-ex12-thunkify.js
+```
+
+```js
+	var aa = require('aa');
+	var thunkify = aa.thunkify;
+	var asyncThunk = thunkify(asyncCallback);
+
+
+	aa(main);
+
+
+	function *main() {
+		console.log('11:', yield asyncThunk(100, 11));
+		console.log('12:', yield asyncThunk(100, 12));
+		console.log('13:', yield asyncThunk(100, 13));
+
+		asyncThunk(100, 21)
+		(function (err, val) {
+			console.log('21:', val);
+			asyncThunk(100, 22)
+			(function (err, val) {
+				console.log('22:', val);
+				asyncThunk(100, 23)
+				(function (err, val) {
+					console.log('23:', val);
+				});
+			});
+		});
+	}
+
+
+	// asyncCallback(ms, arg. cb) : node style normal callback
+	// cb : function (err, val)
+	function asyncCallback(ms, arg, cb) {
+		setTimeout(function () { cb(null, arg); }, ms);
+	}
+```
+
+
+### Quick example collection: [aa-readme-example.js](examples/aa-readme-example.js#readme)
 
 ```bash
 $ node aa-readme-example.js
-  or
-$ iojs aa-readme-example.js
 ```
 
 
