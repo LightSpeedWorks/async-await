@@ -13,9 +13,9 @@ INSTALL:
 ----
 
 ```bash
-$ npm install aa
+$ npm install aa --save
    or
-$ npm install async-await
+$ npm install async-await --save
 ```
 
 [![NPM](https://nodei.co/npm/aa.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aa/)
@@ -35,6 +35,71 @@ PREPARE:
 
 
 USAGE:
+----
+
+### aa(generator or generator function) : returns promise (thunkified promise)
+
+basic usage. <br>
+you can `aa()` promises, generators, and generator functions.
+
+```js
+aa(function *() {
+	// *** SEQUENTIAL EXECUTION ***
+
+	// yield value returns itself
+	yiled 1;
+	yiled [1, 2, 3];
+	yiled {x:1, y:2, z:3};
+
+	// yield promise returns resolved value
+	yield Promise.resolve(1);
+
+	// or throws rejected error
+	try { yield Promise.reject(new Error('expected')); }
+	catch (e) { console.error('%s', e); }
+
+	// *** PARALLEL EXECUTION ***
+
+	// yield an array of promises waits all promises and returns resolved array
+	yield [Promise.resolve(1), Promise.resolve(2)];
+
+	// yield an object of promises waits all promises and returns resolved object
+	yield {x: Promise.resolve(1), y: Promise.resolve(2)};
+
+	// *** OTHERS AND COMBINED OPERATIONS ***
+
+	// yield thunk
+	// yield generator or generator function
+	// yield channel for event stream
+});
+```
+
+
+### aa.promisify(node style function) : function returns promise
+
+`promisify()` converts node style function into a function returns promise. <br>
+you can use `fs.exists()` and `child_process.exec()` also.
+
+### aa.thunkify(node style function) : function returns thunk
+
+`thunkify()` converts node style function into a thunkified function. <br>
+you can use `fs.exists()` and `child_process.exec()` also.
+
+### aa.Channel() : new channel for event stream
+
+`Channel()` returns a new channel for event stream. <br>
+use a channel for node style function as a callback. <br>
+yield channel for wait it.  <br>
+
+
+### yield : waits and returns resolved value.
+
+you can `yield` promises, thunkified functions,
+generators, generator functions,
+primitive values, arrays, and objects. <br>
+
+
+EXAMPLES:
 ----
 
 ### Example 1 sequential: [aa-readme-ex01-seq.js](examples/aa-readme-ex01-seq.js#readme)
