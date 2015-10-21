@@ -1,8 +1,11 @@
 [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
 ====
 
-  [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await) library.<br/>
-  co like library, go like channel, thunkify or promisefy wrap package.
+[aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
+====
+
+  [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await) library. <br>
+  co like library, go like channel, thunkify or promisify wrap package.
 
   using ES6 (ES2015) generator function.
 

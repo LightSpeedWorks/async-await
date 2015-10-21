@@ -16,7 +16,7 @@
 
 		var obj = yield {
 			pkg: readJSON(pkgFile),
-			release: readJSON(releaseFile, {version: ''})
+			release: readJSON(releaseFile, {names: [], version: ''})
 		};
 		var pkg = obj.pkg, release = obj.release;
 
@@ -24,17 +24,18 @@
 			return console.log('version', release.version, 'is already released');
 
 		release.version = pkg.version;
+		if (!release.names) release.names = [];
+		if (release.names.indexOf(pkg.name) < 0)
+			release.names.unshift(pkg.name);
 		yield writeJSON(releaseFile, release)
 
-		pkg.name = 'async-await';
-		console.log(pkg.name, pkg.version);
-		yield writeJSON(pkgFile, pkg);
-		yield execCommand('cd .. & npm publish');
+		for (var i in release.names) {
+			pkg.name = release.names[i];
+			console.log(pkg.name, pkg.version);
+			yield writeJSON(pkgFile, pkg);
+			yield execCommand('cd .. & npm publish');
+		}
 
-		pkg.name = 'aa';
-		console.log(pkg.name, pkg.version);
-		yield writeJSON(pkgFile, pkg);
-		yield execCommand('cd .. & npm publish');
 	});
 
 	// execCommand
