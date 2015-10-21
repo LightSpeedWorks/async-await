@@ -32,8 +32,8 @@
 	}
 
 
-	// asyncCallback(ms, arg. cb) : node style normal callback
-	// cb : function (err, val)
-	function asyncCallback(ms, arg, cb) {
-		setTimeout(function () { cb(null, arg); }, ms);
+	// asyncCallback(msec, arg. callback) : node style normal callback
+	// callback : function (err, val)
+	function asyncCallback(msec, arg, callback) {
+		setTimeout(callback, msec, null, arg);
 	}

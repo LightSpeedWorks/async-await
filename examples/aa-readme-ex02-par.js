@@ -32,25 +32,25 @@
 	}
 
 
-	// asyncPromise(ms, arg) : promise
-	function asyncPromise(ms, arg) {
-		return new Promise(function (res, rej) {
-			setTimeout(function () { res(arg); }, ms);
+	// asyncPromise(msec, arg) : promise
+	function asyncPromise(msec, arg) {
+		return new Promise(function (resolve, reject) {
+			setTimeout(resolve, msec, arg);
 		});
 	}
 
 
-	// asyncThunk(ms, arg) : thunk
-	function asyncThunk(ms, arg) {
-		return function (cb) {
-			setTimeout(function () { cb(null, arg); }, ms);
+	// asyncThunk(msec, arg) : thunk
+	function asyncThunk(msec, arg) {
+		return function (callback) {
+			setTimeout(callback, msec, null, arg);
 		};
 	}
 
 
-	// asyncGenerator(ms, arg) : generator
-	function *asyncGenerator(ms, arg) {
+	// asyncGenerator(msec, arg) : generator
+	function *asyncGenerator(msec, arg) {
 		var chan = aa.Channel();
-		setTimeout(function () { chan(arg); }, ms);
+		setTimeout(chan, msec, arg);
 		return yield chan;
 	}

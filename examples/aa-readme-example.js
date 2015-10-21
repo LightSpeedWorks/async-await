@@ -5,44 +5,46 @@
 	}
 
 
-	// sleep(ms, args,... cb) : node style normal callback
-	function sleep(ms) {
+	// sleep(msec, args,... callback) : node style normal callback
+	// callback : function (err, val)
+	function sleep(msec) {
 		var args = [].slice.call(arguments, 1);
-		setTimeout.apply(null, [args.pop(), ms, null].concat(args));
+		setTimeout.apply(null, [args.pop(), msec, null].concat(args));
 	}
 
-	sleep(1000, function (err, val) { console.log('1000 ms OK'); });
+	sleep(1000, function (err, val) { console.log('1000 msec OK'); });
 
 
-	// delay(ms, args,...)(cb) : thunk
-	function delay(ms) {
+	// delay(msec, args,...)(callback) : thunk
+	// callback : function (err, val)
+	function delay(msec) {
 		var args = [].slice.call(arguments);
-		return function (cb) {
-			sleep.apply(null, args.concat(cb));
+		return function (callback) {
+			sleep.apply(null, args.concat(callback));
 		};
 	}
 	// var delay = aa.thunkify(sleep);
 
 	delay(1100)(
-		function (err, val) { console.log('1100 ms OK'); }
+		function (err, val) { console.log('1100 msec OK'); }
 	);
 
 
 	// aa.promisify(fn)   : returns wrapped function a.k.a thunkify and promisify
-	// wait(ms, args,...) : returns promise & thunk
+	// wait(msec, args,...) : returns promise & thunk
 	var wait = aa.promisify(sleep);
 
 	// wait() : as a thunk
 	wait(1200)(
-		function (err, val) { console.log('1200 ms OK'); }
+		function (err, val) { console.log('1200 msec OK'); }
 	);
 
 	// wait() : as a promise
 	wait(1300).then(
-		function (val) { console.log('1300 ms OK'); },
-		function (err) { console.log('1300 ms NG', err); }
+		function (val) { console.log('1300 msec OK'); },
+		function (err) { console.log('1300 msec NG', err); }
 	).catch(
-		function (err) { console.log('1300 ms NG2', err); }
+		function (err) { console.log('1300 msec NG2', err); }
 	);
 
 
@@ -97,13 +99,13 @@
 
 		// fork thread -  make new thread and start
 		aa(function *() {
-			yield wait(200);      // wait 200 ms
+			yield wait(200);      // wait 200 msec
 			return 200;
 		})(chan);               // send 200 to channel : join or sync
 
 		// fork thread -  make new thread and start
 		aa(function *() {
-			yield wait(100);      // wait 100 ms
+			yield wait(100);      // wait 100 msec
 			return 100;
 		})(chan);               // send 100 to channel : join or sync
 
