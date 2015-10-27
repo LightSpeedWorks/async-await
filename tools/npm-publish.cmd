@@ -1,2 +1,2 @@
-node npm-publish
+node --harmony npm-publish
 @pause
