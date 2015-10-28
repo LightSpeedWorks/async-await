@@ -1,10 +1,6 @@
 [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
 ====
 
-[aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
-====
-
-  [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await) library. <br>
   co like library, go like channel, thunkify or promisify wrap package.
 
   using ES6 (ES2015) generator function.
@@ -34,16 +30,22 @@ PREPARE:
   var aa = require('aa');
   // or
   var aa = require('async-await');
+
+  var thunkify  = aa.thunkify;
+  var promisify = aa.promisify;
+  var Channel   = aa.Channel;
 ```
 
 
 USAGE:
 ----
 
-### aa(generator or generator function) : returns promise (thunkified promise)
+### aa(generator or generator function) 
 
-basic usage. <br>
-you can `aa()` promises, generators, and generator functions.
+  `aa()` returns promise (thunkified promise).
+
+  basic usage. <br>
+  you can `aa()` promises, generators, and generator functions.
 
 ```js
 aa(function *() {
@@ -78,15 +80,79 @@ aa(function *() {
 ```
 
 
-### aa.promisify(node style function) : function returns promise
+### aa.promisify([ctx,] fn, [options])
 
-`promisify()` converts node style function into a function returns promise. <br>
-you can use `fs.exists()` and `child_process.exec()` also.
+  `promisify()` converts node style function into a function returns promise-thunk. <br>
+  you can use `fs.exists()` and `child_process.exec()` also.
 
-### aa.thunkify(node style function) : function returns thunk
+  + `ctx`: context object. default: this or undefined.
+  + `fn`: node-style normal function.
+  + `options`: options object.
+    + `conbtext`: context object.
 
-`thunkify()` converts node style function into a thunkified function. <br>
-you can use `fs.exists()` and `child_process.exec()` also.
+  also thenable, yieldable, callable.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+var pg_connect = promisify(pg, pg.connect);         // -> yield pg_connect()
+var client_query = promisify(client, client.query); // -> yield client_query()
+```
+
+### aa.promisify(object, method, [postfix])
+
+  `promisify()` defines method promisified function returns promise-thunk.
+
+  + `object`: target object.
+  + `method`: method name string.
+  + `postfix`: method name postfix or suffix. default: 'A'.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+promisify(pg, 'connect');                  // -> yield pg.connectA()
+promisify(pg.Client.prototype, 'connect'); // -> yield client.connectA()
+promisify(pg.Client.prototype, 'query');   // -> yield client.queryA()
+```
+
+### aa.thunkify([ctx,] fn, [options])
+
+  `thunkify()` converts node style function into a thunkified function. <br>
+  you can use `fs.exists()` and `child_process.exec()` also.
+
+  + `ctx`: context object. default: this or undefined.
+  + `fn`: node-style normal function with callback.
+  + `options`: options object.
+    + `conbtext`: context object.
+
+  also yieldable, callable.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+var pg_connect = thunkify(pg, pg.connect);         // -> yield pg_connect()
+var client_query = thunkify(client, client.query); // -> yield client_query()
+```
+
+### aa.thunkify(object, method, [postfix])
+
+  `thunkify()` defines method thunkified function returns thunk.
+
+  + `object`: target object.
+  + `method`: method name string.
+  + `postfix`: method name postfix or suffix. default: 'A'.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+thunkify(pg, 'connect');                  // -> yield pg.connectA()
+thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectA()
+thunkify(pg.Client.prototype, 'query');   // -> yield client.queryA()
+```
 
 ### aa.Channel() : new channel for event stream
 
