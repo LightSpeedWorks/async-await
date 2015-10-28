@@ -1,10 +1,10 @@
 {
   "name": "aa",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "aa - async-await. co like library, go like channel, thunkify or promisify wrap package.",
   "main": "aa.js",
   "dependencies": {
-    "promise-thunk": ">=0.1.7"
+    "promise-thunk": ">=0.1.8"
   },
   "devDependencies": {
     "co": ">=4.6.0",
