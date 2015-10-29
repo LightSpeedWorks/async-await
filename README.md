@@ -88,7 +88,7 @@ aa(function *() {
   + `ctx`: context object. default: this or undefined.
   + `fn`: node-style normal function.
   + `options`: options object.
-    + `conbtext`: context object.
+    + `context`: context object.
 
   also thenable, yieldable, callable.
 
@@ -125,7 +125,7 @@ promisify(pg.Client.prototype, 'query');   // -> yield client.queryA()
   + `ctx`: context object. default: this or undefined.
   + `fn`: node-style normal function with callback.
   + `options`: options object.
-    + `conbtext`: context object.
+    + `context`: context object.
 
   also yieldable, callable.
 
