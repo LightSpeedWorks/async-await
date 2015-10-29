@@ -101,8 +101,8 @@ aa(function *() {
 
 ```js
 var pg = require('pg');
-var pg_connect = promisify(pg, pg.connect);         // -> yield pg_connect()
-var client_query = promisify(client, client.query); // -> yield client_query()
+var pg_connect = aa.promisify(pg, pg.connect);         // -> yield pg_connect()
+var client_query = aa.promisify(client, client.query); // -> yield client_query()
 ```
 
 ### aa.promisify(object, method, [options])
@@ -119,9 +119,9 @@ var client_query = promisify(client, client.query); // -> yield client_query()
 
 ```js
 var pg = require('pg');
-promisify(pg, 'connect', 'A');             // -> yield pg.connectA()
-promisify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
-promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
+aa.promisify(pg, 'connect', {postfix: 'A'};             // -> yield pg.connectA()
+aa.promisify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
+aa.promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
 ```
 
 ### aa.promisifyAll(object, [options])
@@ -133,13 +133,20 @@ promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
     + `postfix`: method name postfix or suffix. default: 'Async'.
     + `suffix`: method name postfix or suffix. default: 'Async'.
 
+#### file system `fs` example:
+
+```js
+var fs = require('fs');
+aa.promisifyAll(fs, {postfix: 'A'});  // -> yield fs.readFileA()
+```
+
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-promisifyAll(pg.constructor.prototype, 'A');  // -> yield pg.connectA()
-promisifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
-                                    // -> yield client.queryAsync()
+aa.promisifyAll(pg.constructor.prototype, {postfix: 'A'});  // -> yield pg.connectA()
+aa.promisifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
+                                       // -> yield client.queryAsync()
 ```
 
 ### aa.thunkify([ctx,] fn, [options])
@@ -158,8 +165,8 @@ promisifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
 
 ```js
 var pg = require('pg');
-var pg_connect = thunkify(pg, pg.connect);         // -> yield pg_connect()
-var client_query = thunkify(client, client.query); // -> yield client_query()
+var pg_connect = aa.thunkify(pg, pg.connect);         // -> yield pg_connect()
+var client_query = aa.thunkify(client, client.query); // -> yield client_query()
 ```
 
 ### aa.thunkify(object, method, [options])
@@ -176,9 +183,9 @@ var client_query = thunkify(client, client.query); // -> yield client_query()
 
 ```js
 var pg = require('pg');
-thunkify(pg, 'connect', {postfix: 'A'});  // -> yield pg.connectA()
-thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
-thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
+aa.thunkify(pg, 'connect', {postfix: 'A'});  // -> yield pg.connectA()
+aa.thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
+aa.thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
 ```
 
 ### aa.thunkifyAll(object, [options])
@@ -190,13 +197,20 @@ thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
     + `postfix`: method name postfix or suffix. default: 'Async'.
     + `suffix`: method name postfix or suffix. default: 'Async'.
 
+#### file system `fs` example:
+
+```js
+var fs = require('fs');
+aa.thunkifyAll(fs, {postfix: 'A'});  // -> yield fs.readFileA()
+```
+
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-thunkifyAll(pg.constructor.prototype, 'A');  // -> yield pg.connectA()
-thunkifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
-                                   // -> yield client.queryAsync()
+aa.thunkifyAll(pg.constructor.prototype, {postfix: 'A'});  // -> yield pg.connectA()
+aa.thunkifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
+                                      // -> yield client.queryAsync()
 ```
 
 ### aa.Channel() : new channel for event stream
