@@ -31,9 +31,14 @@ PREPARE:
   // or
   var aa = require('async-await');
 
-  var thunkify  = aa.thunkify;
-  var promisify = aa.promisify;
-  var Channel   = aa.Channel;
+  var promisify    = aa.promisify;
+  var thunkify     = aa.thunkify;
+  var promisifyAll = aa.promisifyAll;
+  var thunkifyAll  = aa.thunkifyAll;
+  var Channel      = aa.Channel;
+
+  var Promise      = aa.Promise;      // override native Promise
+  var PromiseThunk = aa.PromiseThunk; // use PromiseThunk indivisually
 ```
 
 
@@ -100,21 +105,41 @@ var pg_connect = promisify(pg, pg.connect);         // -> yield pg_connect()
 var client_query = promisify(client, client.query); // -> yield client_query()
 ```
 
-### aa.promisify(object, method, [postfix])
+### aa.promisify(object, method, [options])
 
   `promisify()` defines method promisified function returns promise-thunk.
 
   + `object`: target object.
   + `method`: method name string.
-  + `postfix`: method name postfix or suffix. default: 'A'.
+  + `options`: method name postfix or suffix. default: 'Async'. or options object.
+    + `postfix`: method name postfix or suffix. default: 'Async'.
+    + `suffix`: method name postfix or suffix. default: 'Async'.
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-promisify(pg, 'connect');                  // -> yield pg.connectA()
-promisify(pg.Client.prototype, 'connect'); // -> yield client.connectA()
-promisify(pg.Client.prototype, 'query');   // -> yield client.queryA()
+promisify(pg, 'connect', 'A');             // -> yield pg.connectA()
+promisify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
+promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
+```
+
+### aa.promisifyAll(object, [options])
+
+  `promisifyAll()` defines all methods promisified function returns promise-thunk.
+
+  + `object`: target object.
+  + `options`: method name postfix or suffix. default: 'Async'. or options object.
+    + `postfix`: method name postfix or suffix. default: 'Async'.
+    + `suffix`: method name postfix or suffix. default: 'Async'.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+promisifyAll(pg.constructor.prototype, 'A');  // -> yield pg.connectA()
+promisifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
+                                    // -> yield client.queryAsync()
 ```
 
 ### aa.thunkify([ctx,] fn, [options])
@@ -137,21 +162,41 @@ var pg_connect = thunkify(pg, pg.connect);         // -> yield pg_connect()
 var client_query = thunkify(client, client.query); // -> yield client_query()
 ```
 
-### aa.thunkify(object, method, [postfix])
+### aa.thunkify(object, method, [options])
 
   `thunkify()` defines method thunkified function returns thunk.
 
   + `object`: target object.
   + `method`: method name string.
-  + `postfix`: method name postfix or suffix. default: 'A'.
+  + `options`: method name postfix or suffix. default: 'Async'. or options object.
+    + `postfix`: method name postfix or suffix. default: 'Async'.
+    + `suffix`: method name postfix or suffix. default: 'Async'.
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-thunkify(pg, 'connect');                  // -> yield pg.connectA()
-thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectA()
-thunkify(pg.Client.prototype, 'query');   // -> yield client.queryA()
+thunkify(pg, 'connect', {postfix: 'A'});  // -> yield pg.connectA()
+thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
+thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
+```
+
+### aa.thunkifyAll(object, [options])
+
+  `thunkifyAll()` defines all methods thunkified function returns thunk.
+
+  + `object`: target object.
+  + `options`: method name postfix or suffix. default: 'Async'. or options object.
+    + `postfix`: method name postfix or suffix. default: 'Async'.
+    + `suffix`: method name postfix or suffix. default: 'Async'.
+
+#### postgres `pg` example:
+
+```js
+var pg = require('pg');
+thunkifyAll(pg.constructor.prototype, 'A');  // -> yield pg.connectA()
+thunkifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
+                                   // -> yield client.queryAsync()
 ```
 
 ### aa.Channel() : new channel for event stream
