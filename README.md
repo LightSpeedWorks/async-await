@@ -111,15 +111,15 @@ var client_query = aa.promisify(client, client.query); // -> yield client_query(
 
   + `object`: target object.
   + `method`: method name string.
-  + `options`: method name postfix or suffix. default: 'Async'. or options object.
-    + `postfix`: method name postfix or suffix. default: 'Async'.
-    + `suffix`: method name postfix or suffix. default: 'Async'.
+  + `options`: method name suffix or postfix. default: 'Async'. or options object.
+    + `suffix`: method name suffix or postfix. default: 'Async'.
+    + `postfix`: method name suffix or postfix. default: 'Async'.
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-aa.promisify(pg, 'connect', {postfix: 'A'};             // -> yield pg.connectA()
+aa.promisify(pg, 'connect', {suffix: 'A'};             // -> yield pg.connectA()
 aa.promisify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
 aa.promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
 ```
@@ -129,22 +129,22 @@ aa.promisify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
   `promisifyAll()` defines all methods promisified function returns promise-thunk.
 
   + `object`: target object.
-  + `options`: method name postfix or suffix. default: 'Async'. or options object.
-    + `postfix`: method name postfix or suffix. default: 'Async'.
-    + `suffix`: method name postfix or suffix. default: 'Async'.
+  + `options`: method name suffix or postfix. default: 'Async'. or options object.
+    + `suffix`: method name suffix or postfix. default: 'Async'.
+    + `postfix`: method name suffix or postfix. default: 'Async'.
 
 #### file system `fs` example:
 
 ```js
 var fs = require('fs');
-aa.promisifyAll(fs, {postfix: 'A'});  // -> yield fs.readFileA()
+aa.promisifyAll(fs, {suffix: 'A'});  // -> yield fs.readFileA()
 ```
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-aa.promisifyAll(pg.constructor.prototype, {postfix: 'A'});  // -> yield pg.connectA()
+aa.promisifyAll(pg.constructor.prototype, {suffix: 'A'});  // -> yield pg.connectA()
 aa.promisifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
                                        // -> yield client.queryAsync()
 ```
@@ -175,15 +175,15 @@ var client_query = aa.thunkify(client, client.query); // -> yield client_query()
 
   + `object`: target object.
   + `method`: method name string.
-  + `options`: method name postfix or suffix. default: 'Async'. or options object.
-    + `postfix`: method name postfix or suffix. default: 'Async'.
-    + `suffix`: method name postfix or suffix. default: 'Async'.
+  + `options`: method name suffix or postfix. default: 'Async'. or options object.
+    + `suffix`: method name suffix or postfix. default: 'Async'.
+    + `postfix`: method name suffix or postfix. default: 'Async'.
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-aa.thunkify(pg, 'connect', {postfix: 'A'});  // -> yield pg.connectA()
+aa.thunkify(pg, 'connect', {suffix: 'A'});  // -> yield pg.connectA()
 aa.thunkify(pg.Client.prototype, 'connect'); // -> yield client.connectAsync()
 aa.thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
 ```
@@ -193,22 +193,22 @@ aa.thunkify(pg.Client.prototype, 'query');   // -> yield client.queryAsync()
   `thunkifyAll()` defines all methods thunkified function returns thunk.
 
   + `object`: target object.
-  + `options`: method name postfix or suffix. default: 'Async'. or options object.
-    + `postfix`: method name postfix or suffix. default: 'Async'.
-    + `suffix`: method name postfix or suffix. default: 'Async'.
+  + `options`: method name suffix or postfix. default: 'Async'. or options object.
+    + `suffix`: method name suffix or postfix. default: 'Async'.
+    + `postfix`: method name suffix or postfix. default: 'Async'.
 
 #### file system `fs` example:
 
 ```js
 var fs = require('fs');
-aa.thunkifyAll(fs, {postfix: 'A'});  // -> yield fs.readFileA()
+aa.thunkifyAll(fs, {suffix: 'A'});  // -> yield fs.readFileA()
 ```
 
 #### postgres `pg` example:
 
 ```js
 var pg = require('pg');
-aa.thunkifyAll(pg.constructor.prototype, {postfix: 'A'});  // -> yield pg.connectA()
+aa.thunkifyAll(pg.constructor.prototype, {suffix: 'A'});  // -> yield pg.connectA()
 aa.thunkifyAll(pg.Client.prototype);  // -> yield client.connectAsync()
                                       // -> yield client.queryAsync()
 ```
