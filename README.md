@@ -41,6 +41,15 @@ PREPARE:
   var PromiseThunk = aa.PromiseThunk; // use PromiseThunk indivisually
 ```
 
+or
+
+https://lightspeedworks.github.io/promise-thunk/promise-thunk.js <br/>
+https://lightspeedworks.github.io/aa/aa.js
+
+```html
+<script src="https://lightspeedworks.github.io/promise-thunk/promise-thunk.js"></script>
+<script src="https://lightspeedworks.github.io/aa/aa.js"></script>
+```
 
 USAGE:
 ----
