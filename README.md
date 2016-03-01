@@ -1,6 +1,8 @@
 [aa](https://www.npmjs.com/package/aa) - [async-await](https://www.npmjs.com/package/async-await)
 ====
 
+[![Join the chat at https://gitter.im/LightSpeedWorks/async-await](https://badges.gitter.im/LightSpeedWorks/async-await.svg)](https://gitter.im/LightSpeedWorks/async-await?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
   co like library, go like channel, thunkify or promisify wrap package.
 
   using ES6 (ES2015) generator function.
