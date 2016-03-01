@@ -1,8 +1,12 @@
+  'use strict';
+
   try {
     var aa = require('../aa');
   } catch (e) {
     var aa = require('aa');
   }
+
+  var Promise = aa.Promise;
 
   var assert = require('assert');
 
@@ -18,14 +22,14 @@
 
   // timed(done, ms, val)
   function timed(done, ms, val) {
-    if (arguments.length < 3) val = Error('time out');
+    if (arguments.length < 3) val = new Error('time out');
     var timer = setTimeout(function () { finish(val); }, ms);
-    function finish(val) {
+    function finish(err, val) {
       if (timer) {
         clearTimeout(timer);
         timer = null;
       }
-      done && done(val);
+      done && done(err);
       done = null;
     }
     return finish;
@@ -35,7 +39,7 @@
   function expectError(done) {
     return function (err, val) {
       if (err instanceof Error) return done();
-      done(Error('unexpected val: ' + val + (err == null ? '' : ' ' + err)));
+      done(new Error('unexpected val: ' + val + (err == null ? '' : ' ' + err)));
     };
   }
 
@@ -45,7 +49,7 @@
     if (ms >= 0)
       setTimeout.apply(null, [cb, ms, null].concat(args));
     else
-      setTimeout(cb, 0, RangeError('sleep ms must be plus'));
+      setTimeout(cb, 0, new RangeError('sleep ms must be plus'));
   }
 
 
@@ -148,8 +152,8 @@
         v = yield Promise.resolve(123);
         assert.equal(v, 123);
         try {
-          v = yield Promise.reject(Error('expected'));
-          done(Error('reject must throw'));
+          v = yield Promise.reject(new Error('expected'));
+          done(new Error('reject must throw'));
         } catch (err) {
           v = 234;
         }
@@ -173,7 +177,7 @@
         assert.equal(v, 11);
         try {
           v = yield delay(-1, 12);
-          done(Error('delay -1 must throw'));
+          done(new Error('delay -1 must throw'));
         } catch (err) {
           v = 13;
         }
@@ -197,7 +201,7 @@
         assert.equal(v, 22);
         try {
           v = yield wait(-1, 23);
-          done(Error('wait -1 must throw'));
+          done(new Error('wait -1 must throw'));
         } catch (err) {
           v = 24;
         }
@@ -362,11 +366,6 @@
           cerr('44 err:', err);
           done(err); }
       )(done);
-//      .catch(
-//        function (err) {
-//          cerr('55 err:', err);
-//          done(err); }
-//      )(done);
 
     });
 

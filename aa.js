@@ -103,7 +103,7 @@ this.aa = function (PromiseThunk) {
 
 		// is promise? then do it.
 		if (isPromise(gtor))
-			return new PromiseThunk(gtor);
+			return PromiseThunk.resolve(gtor);
 
 		// is function? then promisify it.
 		if (typeof gtor === 'function')
