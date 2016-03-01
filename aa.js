@@ -103,7 +103,7 @@ this.aa = function (PromiseThunk) {
 
 		// is promise? then do it.
 		if (isPromise(gtor))
-			return PromiseThunk(gtor);
+			return new PromiseThunk(gtor);
 
 		// is function? then promisify it.
 		if (typeof gtor === 'function')
@@ -113,7 +113,7 @@ this.aa = function (PromiseThunk) {
 		if (!isGenerator(gtor))
 			return Channel.apply(ctx, arguments);
 
-		var resolve, reject, p = PromiseThunk(
+		var resolve, reject, p = new PromiseThunk(
 			function (res, rej) { resolve = res; reject = rej; });
 
 		nextTick(callback);
