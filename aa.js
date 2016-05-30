@@ -361,12 +361,12 @@ this.aa = function (PromiseThunk) {
 		return this;
 
 		function close()    { return channel.close(); }
-		function error(err) { return channel.send(err); }
+		function error(err) { try { channel.send(err); } catch (e) {} }
 
 		function readable() {
 			var buf = this.read();
 			if (!buf) return;
-			channel.send(buf);
+			try { channel.send(buf); } catch (e) {}
 		} // readable
 	} // stream
 
