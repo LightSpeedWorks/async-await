@@ -165,14 +165,17 @@ void function () {
 			typeof val.then === 'function' ? promisecb(val, cb) :
 			objcb(val, cb); },
 		Array: parcb,
-		Error: errcb,
+		Error: valcb,
 		Promise: promisecb,
-		$: function (val, cb) {
+		$: valcb
+		/*
+		function (val, cb) {
 			typeof val.next === 'function' && typeof val['throw'] === 'function' ? gtorcb(val, cb) :
 			typeof val.then === 'function' ? promisecb(val, cb) :
 			val instanceof Error ? nextTick(cb, val) :
 			val.constructor === Array ? parcb(val, cb) :
 			objcb(val, cb); }
+		*/
 	};
 
 	// parcb(args, cb) for Array
