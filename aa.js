@@ -379,9 +379,9 @@ this.aa = function (PromiseThunk) {
 	} // complete
 
 
-	function wait(ms) {
+	function wait(msec, val) {
 		return function (cb) {
-			setTimeout(cb, ms);
+			setTimeout(cb, msec, null, val);
 		};
 	};
 
