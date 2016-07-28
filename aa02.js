@@ -592,21 +592,21 @@ void function () {
 
 	// isPromise(promise)
 	setValue(aa, 'isPromise', isPromise);
-	function isPromise(promise) {
-		return !!promise && typeof promise.then === 'function';
+	function isPromise(p) {
+		return (typeof p === 'object' && !!p || typeof p === 'function') && typeof p.then === 'function';
 	}
 
 	// isIterator(iter)
 	setValue(aa, 'isIterator', isIterator);
 	function isIterator(iter) {
-		return !!iter && (typeof iter.next === 'function' || isIterable(iter));
+		return typeof iter === 'object' && !!iter && (typeof iter.next === 'function' || isIterable(iter));
 	}
 
 	// isIterable(iter)
 	setValue(aa, 'isIterable', isIterable);
 	function isIterable(iter) {
-		return !!iter && typeof Symbol === 'function' &&
-				!!Symbol.iterator && typeof iter[Symbol.iterator] === 'function';
+		return typeof iter === 'object' && !!iter && typeof Symbol === 'function' &&
+			!!Symbol.iterator && typeof iter[Symbol.iterator] === 'function';
 	}
 
 	// makeArrayFromIterator(iter or array)
@@ -632,6 +632,15 @@ void function () {
 	setValue(aa, 'Promise', Promise);
 	setValue(aa, 'PromiseThunk', Promise);
 
+	if (Object.getOwnPropertyNames)
+		Object.getOwnPropertyNames(PromiseThunk).forEach(function (prop) {
+			if (!aa.hasOwnProperty(prop))
+				setValue(aa, prop, PromiseThunk[prop]);
+		});
+	else
+		for (var prop in PromiseThunk)
+			if (!aa.hasOwnProperty(prop))
+				setValue(aa, prop, PromiseThunk[prop]);
 
 	setValue(aa, 'aa', aa);
 	if (typeof module === 'object' && module && module.exports)
