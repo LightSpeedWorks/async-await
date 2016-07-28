@@ -9,6 +9,10 @@ void function () {
 	'use strict';
 
 	var Promise = require('promise-thunk');
+	var isPromise = Promise.isPromise;
+	var isIterator = Promise.isIterator;
+	var isIterable = Promise.isIterable;
+	var makeArrayFromIterator = Promise.makeArrayFromIterator;
 
 	var slice = [].slice;
 	var push = [].push;
@@ -311,6 +315,7 @@ void function () {
 
 	// aa - async-await
 	function aa(val) {
+		if (arguments.length === 0) return Channel();
 		if (arguments.length <= 1 && typeof val === 'function' && !isGeneratorFunction(val)) return aa.promisify(val);
 		var resolve, reject, callback, result;
 		var promise = new Promise(function (res, rej) { resolve = res; reject = rej; });
@@ -388,6 +393,7 @@ void function () {
 		} // done
 
 		return chan;
+
 		function channel(err, val) {
 			if (typeof val === 'function')
 				callbacks.push(val);
@@ -420,213 +426,6 @@ void function () {
 			setTimeout(cb, msec, null, val);
 		};
 	}
-
-
-	// aa.thunkify(fn)
-	setValue(aa, 'thunkify', thunkify);
-	function thunkify(fn, options) {
-		// thunkify(object target, string method, [object options]) : undefined
-		if (fn && typeof fn === 'object' && options && typeof options === 'string') {
-			var object = fn, method = options, options = arguments[2];
-			var suffix = options && typeof options === 'string' ? options :
-				options && typeof options.suffix === 'string' ? options.suffix :
-				options && typeof options.postfix === 'string' ? options.postfix : 'Async';
-			var methodAsyncCached = method + suffix + 'Cached';
-			Object.defineProperty(object, method + suffix, {
-				get: function () {
-					return this.hasOwnProperty(methodAsyncCached) &&
-						typeof this[methodAsyncCached] === 'function' ? this[methodAsyncCached] :
-						(setValue(this, methodAsyncCached, thunkify(this, this[method])), this[methodAsyncCached]);
-				},
-				configurable: true
-			});
-			return;
-		}
-
-		// thunkify([object ctx,] function fn) : function
-		var ctx = typeof this !== 'function' ? this : undefined;
-		if (typeof options === 'function') ctx = fn, fn = options, options = arguments[2];
-		if (options && options.context) ctx = options.context;
-		if (typeof fn !== 'function')
-			throw new TypeError('thunkify: argument must be a function');
-
-		// thunkified
-		thunkified.thunkified = true;
-		return thunkified;
-
-		function thunkified() {
-			var result, callbacks = [], unhandled;
-			arguments[arguments.length++] = function callback(err, val) {
-				if (result) {
-					if (err)
-						console.error(COLOR_ERROR + 'Unhandled callback error: ' + err2str(err) + COLOR_NORMAL);
-					return;
-				}
-
-				result = arguments;
-				if (callbacks.length === 0 && err instanceof Error)
-					unhandled = true,
-					console.error(COLOR_ERROR + 'Unhandled callback error: ' + err2str(err) + COLOR_NORMAL);
-
-				for (var i = 0, n = callbacks.length; i < n; ++i)
-					fire(callbacks[i]);
-				callbacks = [];
-			};
-			fn.apply(ctx, arguments);
-
-			// thunk
-			return function thunk(cb) {
-				if (typeof cb !== 'function')
-					throw new TypeError('argument must be a function');
-
-				if (unhandled)
-					unhandled = false,
-					console.error(COLOR_ERROR + 'Unhandled callback error handled: ' + err2str(result[0]) + COLOR_NORMAL);
-
-				if (result) return fire(cb);
-				callbacks.push(cb);
-			};
-
-			// fire
-			function fire(cb) {
-				var err = result[0], val = result[1];
-				try {
-					return err instanceof Error || result.length === cb.length ? cb.apply(ctx, result) :
-						// normal node style callback
-						result.length === 2 ? cb.call(ctx, err, val) :
-						// fs.exists like callback, arguments[0] is value
-						result.length === 1 ? cb.call(ctx, null, result[0]) :
-						// unknown callback
-						result.length === 0 ? cb.call(ctx) :
-						// child_process.exec like callback
-						cb.call(ctx, null, slice.call(result, err == null ? 1 : 0));
-				} catch (e) { cb.call(ctx, e); }
-			} // fire
-		}; // thunkified
-	} // thunkify
-
-
-	// aa.promisify(fn)
-	setValue(aa, 'wrap', promisify);
-	setValue(aa, 'promisify', promisify);
-	function promisify(fn, options) {
-		// promisify(object target, string method, [object options]) : undefined
-		if (fn && typeof fn === 'object' && options && typeof options === 'string') {
-			var object = fn, method = options, options = arguments[2];
-			var suffix = options && typeof options === 'string' ? options :
-				options && typeof options.suffix === 'string' ? options.suffix :
-				options && typeof options.postfix === 'string' ? options.postfix : 'Async';
-			var methodAsyncCached = method + suffix + 'Cached';
-			Object.defineProperty(object, method + suffix, {
-				get: function () {
-					return this.hasOwnProperty(methodAsyncCached) &&
-						typeof this[methodAsyncCached] === 'function' ? this[methodAsyncCached] :
-						(setValue(this, methodAsyncCached, promisify(this, this[method])), this[methodAsyncCached]);
-				},
-				configurable: true
-			});
-			return;
-		}
-
-		// promisify([object ctx,] function fn) : function
-		var ctx = typeof this !== 'function' ? this : undefined;
-		if (typeof options === 'function') ctx = fn, fn = options, options = arguments[2];
-		if (options && options.context) ctx = options.context;
-		if (typeof fn !== 'function')
-			throw new TypeError('promisify: argument must be a function');
-
-		// promisified
-		promisified.promisified = true;
-		return promisified;
-
-		function promisified() {
-			var args = arguments;
-			return new Promise(function (res, rej) {
-				args[args.length++] = function callback(err, val) {
-					try {
-						return err instanceof Error ? rej(err) :
-							// normal node style callback
-							arguments.length === 2 ? (err ? rej(err) : res(val)) :
-							// fs.exists like callback, arguments[0] is value
-							arguments.length === 1 ? res(arguments[0]) :
-							// unknown callback
-							arguments.length === 0 ? res() :
-							// child_process.exec like callback
-							res(slice.call(arguments, err == null ? 1 : 0));
-					} catch (e) { rej(e); }
-				};
-				fn.apply(ctx, args);
-			});
-		};
-	} // promisify
-
-
-	// aa.thunkifyAll(object, options)
-	setValue(aa, 'thunkifyAll', thunkifyAll);
-	function thunkifyAll(object, options) {
-		var keys = Object_getOwnPropertyNames(object);
-
-		keys.forEach(function (method) {
-			if (typeof object[method] === 'function' &&
-					!object[method].promisified &&
-					!object[method].thunkified)
-				thunkify(object, method, options);
-		});
-		return object;
-	}
-
-	// aa.promisifyAll(object, options)
-	setValue(aa, 'promisifyAll', promisifyAll);
-	function promisifyAll(object, options) {
-		var keys = Object_getOwnPropertyNames(object);
-
-		keys.forEach(function (method) {
-			if (typeof object[method] === 'function' &&
-					!object[method].promisified &&
-					!object[method].thunkified)
-				promisify(object, method, options);
-		});
-		return object;
-	}
-
-
-	// isPromise(promise)
-	setValue(aa, 'isPromise', isPromise);
-	function isPromise(p) {
-		return (typeof p === 'object' && !!p || typeof p === 'function') && typeof p.then === 'function';
-	}
-
-	// isIterator(iter)
-	setValue(aa, 'isIterator', isIterator);
-	function isIterator(iter) {
-		return typeof iter === 'object' && !!iter && (typeof iter.next === 'function' || isIterable(iter));
-	}
-
-	// isIterable(iter)
-	setValue(aa, 'isIterable', isIterable);
-	function isIterable(iter) {
-		return typeof iter === 'object' && !!iter && typeof Symbol === 'function' &&
-			!!Symbol.iterator && typeof iter[Symbol.iterator] === 'function';
-	}
-
-	// makeArrayFromIterator(iter or array)
-	setValue(aa, 'makeArrayFromIterator', makeArrayFromIterator);
-	function makeArrayFromIterator(iter) {
-		if (iter instanceof Array) return iter;
-		if (!isIterator(iter)) return [iter];
-		if (isIterable(iter)) iter = iter[Symbol.iterator]();
-		var array = [];
-		try {
-			for (;;) {
-				var val = iter.next();
-				if (val && val.hasOwnProperty('done') && val.done) return array;
-				if (val && val.hasOwnProperty('value')) val = val.value;
-				array.push(val);
-			}
-		} catch (error) {
-			return array;
-		}
-	} // makeArrayFromIterator
 
 
 	setValue(aa, 'Promise', Promise);
