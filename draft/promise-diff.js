@@ -5,7 +5,8 @@ const fs = require('fs');
 let promises = ['promise-light', 'promise-thunk'].map(
 	mod => ({name: mod, object: require(mod)})
 );
-promises.unshift({name: 'promise', object: Promise})
+promises.push({name: 'promise', object: Promise})
+let p0 = promises[0].object;
 
 let keys = Object.keys(promises.reduce((z, x) => {
 	Object.getOwnPropertyNames(x.object).forEach(p => {
@@ -28,13 +29,12 @@ promises.forEach(x => {
 			(pd.enumerable   ? 'E' : 'e') +
 			(pd.configurable ? 'C' : 'c'),
 			typeof pd.value === 'function' ?
-				(pd.value + '') === (Promise[p] + '') ? '==' : '!='
+				(pd.value + '') === (p0[p] + '') ? '==' : '!='
 				: '  ',
 			typeof pd.value === 'number' ||
 			typeof pd.value === 'string' ? pd.value : ' ',
 			typeof pd.value,
 			p);
-			//console.log(p, Promise[p]);
 	});
 	fs.writeFileSync('zzz-' + x.name + '-contents.log', s);
 	console.log('\n');
