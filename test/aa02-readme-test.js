@@ -1,10 +1,6 @@
   'use strict';
 
-  try {
-    var aa = require('../aa');
-  } catch (e) {
-    var aa = require('aa');
-  }
+  var aa = require('../aa02');
 
   var Promise = aa.Promise;
 
