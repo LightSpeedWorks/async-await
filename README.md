@@ -238,6 +238,17 @@ generators, generator functions,
 primitive values, arrays, and objects. <br>
 
 
+### aa.callback(gtor) : returns callback function
+
+`callback(gtor)` returns normal callback function
+
+```js
+http.createServer(aa.callback(function *(req, res) {
+	yield aa.wait(1000);
+	res.end('delayed hello');
+})).listen(process.env.PORT || 8000);
+```
+
 EXAMPLES:
 ----
 

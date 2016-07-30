@@ -428,6 +428,15 @@ void function () {
 	}
 
 
+	// aa.callback(gtor)
+	setValue(aa, 'callback', callback);
+	function callback(gtor) {
+		return function () {
+			return aa(gtor.apply(this, arguments));
+		};
+	}
+
+
 	setValue(aa, 'Promise', Promise);
 	setValue(aa, 'PromiseThunk', Promise);
 

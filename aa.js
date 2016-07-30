@@ -379,9 +379,18 @@ this.aa = function (PromiseThunk) {
 	} // complete
 
 
+	// aa.wait(msec, val)
 	function wait(msec, val) {
 		return function (cb) {
 			setTimeout(cb, msec, null, val);
+		};
+	};
+
+
+	// aa.callback(gtor)
+	aa.callback = function callback(gtor) {
+		return function () {
+			return aa(gtor.apply(this, arguments));
 		};
 	};
 
